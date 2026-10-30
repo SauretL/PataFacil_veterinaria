@@ -16,15 +16,5 @@ namespace PataFacil
         {
             InitializeComponent();
         }
-
-        private void ucClientesMascotas1_Load(object sender, EventArgs e)
-        {
-
-        }
-
-        private void ucTurnos1_Load(object sender, EventArgs e)
-        {
-
-        }
     }
 }
