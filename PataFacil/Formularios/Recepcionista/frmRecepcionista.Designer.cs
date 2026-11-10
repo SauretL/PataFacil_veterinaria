@@ -34,13 +34,19 @@
             lblUsuario = new Label();
             tabPrincipal = new TabControl();
             tabClientes = new TabPage();
-            tabTurnos = new TabPage();
-            tabUrgencias = new TabPage();
-            tabCobros = new TabPage();
             ucClientesMascotas1 = new PataFacil.Formularios.Recepcionista.ucClientesMascotas();
+            tabTurnos = new TabPage();
+            ucTurnos1 = new PataFacil.Formularios.Recepcionista.ucTurnos();
+            tabUrgencias = new TabPage();
+            ucUrgencias1 = new PataFacil.Formularios.Recepcionista.ucUrgencias();
+            tabCobros = new TabPage();
+            ucCobros1 = new PataFacil.Formularios.Recepcionista.ucCobros();
             pnlCabecera.SuspendLayout();
             tabPrincipal.SuspendLayout();
             tabClientes.SuspendLayout();
+            tabTurnos.SuspendLayout();
+            tabUrgencias.SuspendLayout();
+            tabCobros.SuspendLayout();
             SuspendLayout();
             // 
             // pnlCabecera
@@ -63,6 +69,7 @@
             btnCerrarSesion.TabIndex = 2;
             btnCerrarSesion.Text = "Cerrar Sesión";
             btnCerrarSesion.UseVisualStyleBackColor = true;
+            btnCerrarSesion.Click += btnCerrarSesion_Click;
             // 
             // lblTitulo
             // 
@@ -110,34 +117,6 @@
             tabClientes.TabIndex = 0;
             tabClientes.Text = "Clientes y Mascotas";
             // 
-            // tabTurnos
-            // 
-            tabTurnos.BackColor = Color.FromArgb(244, 241, 236);
-            tabTurnos.Location = new Point(4, 26);
-            tabTurnos.Name = "tabTurnos";
-            tabTurnos.Padding = new Padding(3);
-            tabTurnos.Size = new Size(1106, 615);
-            tabTurnos.TabIndex = 1;
-            tabTurnos.Text = "Turnos";
-            // 
-            // tabUrgencias
-            // 
-            tabUrgencias.BackColor = Color.FromArgb(244, 241, 236);
-            tabUrgencias.Location = new Point(4, 24);
-            tabUrgencias.Name = "tabUrgencias";
-            tabUrgencias.Size = new Size(1106, 617);
-            tabUrgencias.TabIndex = 2;
-            tabUrgencias.Text = "Urgencias";
-            // 
-            // tabCobros
-            // 
-            tabCobros.BackColor = Color.FromArgb(244, 241, 236);
-            tabCobros.Location = new Point(4, 24);
-            tabCobros.Name = "tabCobros";
-            tabCobros.Size = new Size(1106, 617);
-            tabCobros.TabIndex = 3;
-            tabCobros.Text = "Cobros";
-            // 
             // ucClientesMascotas1
             // 
             ucClientesMascotas1.BackColor = Color.FromArgb(244, 241, 236);
@@ -146,6 +125,64 @@
             ucClientesMascotas1.Name = "ucClientesMascotas1";
             ucClientesMascotas1.Size = new Size(1108, 612);
             ucClientesMascotas1.TabIndex = 0;
+            // 
+            // tabTurnos
+            // 
+            tabTurnos.BackColor = Color.FromArgb(244, 241, 236);
+            tabTurnos.Controls.Add(ucTurnos1);
+            tabTurnos.Location = new Point(4, 24);
+            tabTurnos.Name = "tabTurnos";
+            tabTurnos.Padding = new Padding(3);
+            tabTurnos.Size = new Size(1106, 617);
+            tabTurnos.TabIndex = 1;
+            tabTurnos.Text = "Turnos";
+            // 
+            // ucTurnos1
+            // 
+            ucTurnos1.BackColor = Color.FromArgb(244, 241, 236);
+            ucTurnos1.Font = new Font("Segoe UI", 10F);
+            ucTurnos1.Location = new Point(0, 0);
+            ucTurnos1.Name = "ucTurnos1";
+            ucTurnos1.Size = new Size(1106, 612);
+            ucTurnos1.TabIndex = 0;
+            // 
+            // tabUrgencias
+            // 
+            tabUrgencias.BackColor = Color.FromArgb(244, 241, 236);
+            tabUrgencias.Controls.Add(ucUrgencias1);
+            tabUrgencias.Location = new Point(4, 24);
+            tabUrgencias.Name = "tabUrgencias";
+            tabUrgencias.Size = new Size(1106, 617);
+            tabUrgencias.TabIndex = 2;
+            tabUrgencias.Text = "Urgencias";
+            // 
+            // ucUrgencias1
+            // 
+            ucUrgencias1.BackColor = Color.FromArgb(244, 241, 236);
+            ucUrgencias1.Font = new Font("Segoe UI", 10F);
+            ucUrgencias1.Location = new Point(0, 0);
+            ucUrgencias1.Name = "ucUrgencias1";
+            ucUrgencias1.Size = new Size(1106, 612);
+            ucUrgencias1.TabIndex = 0;
+            // 
+            // tabCobros
+            // 
+            tabCobros.BackColor = Color.FromArgb(244, 241, 236);
+            tabCobros.Controls.Add(ucCobros1);
+            tabCobros.Location = new Point(4, 24);
+            tabCobros.Name = "tabCobros";
+            tabCobros.Size = new Size(1106, 617);
+            tabCobros.TabIndex = 3;
+            tabCobros.Text = "Cobros";
+            // 
+            // ucCobros1
+            // 
+            ucCobros1.BackColor = Color.FromArgb(244, 241, 236);
+            ucCobros1.Font = new Font("Segoe UI", 10F);
+            ucCobros1.Location = new Point(0, 0);
+            ucCobros1.Name = "ucCobros1";
+            ucCobros1.Size = new Size(1106, 612);
+            ucCobros1.TabIndex = 0;
             // 
             // frmRecepcionista
             // 
@@ -165,6 +202,9 @@
             pnlCabecera.PerformLayout();
             tabPrincipal.ResumeLayout(false);
             tabClientes.ResumeLayout(false);
+            tabTurnos.ResumeLayout(false);
+            tabUrgencias.ResumeLayout(false);
+            tabCobros.ResumeLayout(false);
             ResumeLayout(false);
         }
 
@@ -180,5 +220,8 @@
         private TabPage tabUrgencias;
         private TabPage tabCobros;
         private Formularios.Recepcionista.ucClientesMascotas ucClientesMascotas1;
+        private Formularios.Recepcionista.ucTurnos ucTurnos1;
+        private Formularios.Recepcionista.ucUrgencias ucUrgencias1;
+        private Formularios.Recepcionista.ucCobros ucCobros1;
     }
 }

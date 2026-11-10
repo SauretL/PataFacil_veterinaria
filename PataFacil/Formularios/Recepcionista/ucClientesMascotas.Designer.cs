@@ -47,7 +47,7 @@
             colSexo = new DataGridViewTextBoxColumn();
             colNacimiento = new DataGridViewTextBoxColumn();
             grpCliente = new GroupBox();
-            textBox1 = new TextBox();
+            txtEmail = new TextBox();
             lblEmail = new Label();
             txtTelefono = new TextBox();
             lblTelefono = new Label();
@@ -232,7 +232,7 @@
             // 
             // grpCliente
             // 
-            grpCliente.Controls.Add(textBox1);
+            grpCliente.Controls.Add(txtEmail);
             grpCliente.Controls.Add(lblEmail);
             grpCliente.Controls.Add(txtTelefono);
             grpCliente.Controls.Add(lblTelefono);
@@ -249,12 +249,12 @@
             grpCliente.TabStop = false;
             grpCliente.Text = "Datos del cliente";
             // 
-            // textBox1
+            // txtEmail
             // 
-            textBox1.Location = new Point(15, 160);
-            textBox1.Name = "textBox1";
-            textBox1.Size = new Size(490, 25);
-            textBox1.TabIndex = 9;
+            txtEmail.Location = new Point(15, 160);
+            txtEmail.Name = "txtEmail";
+            txtEmail.Size = new Size(490, 25);
+            txtEmail.TabIndex = 9;
             // 
             // lblEmail
             // 
@@ -448,6 +448,7 @@
             btnBajaCliente.TabIndex = 9;
             btnBajaCliente.Text = "Dar de baja cliente";
             btnBajaCliente.UseVisualStyleBackColor = false;
+            btnBajaCliente.Click += btnDarBajaCliente_Click;
             // 
             // btnModificar
             // 
@@ -462,6 +463,7 @@
             btnModificar.TabIndex = 8;
             btnModificar.Text = "Modificar";
             btnModificar.UseVisualStyleBackColor = false;
+            btnModificar.Click += btnModificar_Click;
             // 
             // btnRegistrar
             // 
@@ -476,6 +478,7 @@
             btnRegistrar.TabIndex = 7;
             btnRegistrar.Text = "Registrar cliente y mascota";
             btnRegistrar.UseVisualStyleBackColor = false;
+            btnRegistrar.Click += btnRegistrar_Click;
             // 
             // btnBajaMascota
             // 
@@ -490,6 +493,7 @@
             btnBajaMascota.TabIndex = 10;
             btnBajaMascota.Text = "Dar de baja mascota";
             btnBajaMascota.UseVisualStyleBackColor = false;
+            btnBajaMascota.Click += btnDarBajaMascota_Click;
             // 
             // btnLimpiar
             // 
@@ -504,6 +508,7 @@
             btnLimpiar.TabIndex = 11;
             btnLimpiar.Text = "Limpiar";
             btnLimpiar.UseVisualStyleBackColor = false;
+            btnLimpiar.Click += btnLimpiar_Click;
             // 
             // ucClientesMascotas
             // 
@@ -555,7 +560,7 @@
         private DataGridViewTextBoxColumn colNacimiento;
         private GroupBox grpCliente;
         private GroupBox grpMascota;
-        private TextBox textBox1;
+        private TextBox txtEmail;
         private Label lblApellido;
         private TextBox txtNombre;
         private TextBox txtApellido;

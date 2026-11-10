@@ -26,5 +26,10 @@ namespace PataFacil
         {
 
         }
+
+        private void btnCerrarSesion_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
+        }
     }
 }
