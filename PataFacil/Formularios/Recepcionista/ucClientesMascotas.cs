@@ -67,7 +67,7 @@ namespace PataFacil.Formularios.Recepcionista
         private void CargarMascotasDelCliente(int idCliente)
         {
             using var conn = new SqlConnection(connectionString);
-            string query = "SELECT id_mascota AS ID, nombre AS Nombre, especie AS Especie, raza AS Raza, sexo AS Sexo, fecha_nacimiento AS Nacimiento FROM Mascotas WHERE idCliente = @idCliente";
+            string query = "SELECT id_mascota AS ID, nombre AS Nombre, especie AS Especie, raza AS Raza, sexo AS Sexo, fecha_nacimiento AS Nacimiento FROM Mascota WHERE idCliente = @idCliente";
 
             using var cmd = new SqlCommand(query, conn);
             cmd.Parameters.AddWithValue("@idCliente", idCliente);
@@ -153,7 +153,7 @@ namespace PataFacil.Formularios.Recepcionista
 
                 int idNuevoCliente = Convert.ToInt32(cmdCliente.ExecuteScalar());
 
-                string queryMascota = @"INSERT INTO Mascotas (idCliente, nombre, especie, raza, sexo, fecha_nacimiento) 
+                string queryMascota = @"INSERT INTO Mascota (idCliente, nombre, especie, raza, sexo, fecha_nacimiento) 
                                         VALUES (@idCliente, @nombreMascota, @especie, @raza, @sexo, @nacimiento)";
 
                 using var cmdMascota = new SqlCommand(queryMascota, conn, transaction);
@@ -205,7 +205,7 @@ namespace PataFacil.Formularios.Recepcionista
 
                 if (mascotaSeleccionadaId != -1)
                 {
-                    string queryMascota = "UPDATE Mascotas SET nombre=@nombre, especie=@especie, raza=@raza, sexo=@sexo, fecha_nacimiento=@nacimiento WHERE id_mascota=@id";
+                    string queryMascota = "UPDATE Mascota SET nombre=@nombre, especie=@especie, raza=@raza, sexo=@sexo, fecha_nacimiento=@nacimiento WHERE id_mascota=@id";
                     using var cmdMascota = new SqlCommand(queryMascota, conn, transaction);
                     cmdMascota.Parameters.AddWithValue("@id", mascotaSeleccionadaId);
                     cmdMascota.Parameters.AddWithValue("@nombre", txtNombreMascota.Text.Trim());
@@ -245,7 +245,7 @@ namespace PataFacil.Formularios.Recepcionista
                 using SqlTransaction transaction = conn.BeginTransaction();
                 try
                 {
-                    using var cmdM = new SqlCommand("DELETE FROM Mascotas WHERE idCliente = @id", conn, transaction);
+                    using var cmdM = new SqlCommand("DELETE FROM Mascota WHERE idCliente = @id", conn, transaction);
                     cmdM.Parameters.AddWithValue("@id", clienteSeleccionadoId);
                     cmdM.ExecuteNonQuery();
 
@@ -278,7 +278,7 @@ namespace PataFacil.Formularios.Recepcionista
             if (dr == DialogResult.Yes)
             {
                 using var conn = new SqlConnection(connectionString);
-                using var cmd = new SqlCommand("DELETE FROM Mascotas WHERE id_mascota = @id", conn);
+                using var cmd = new SqlCommand("DELETE FROM Mascota WHERE id_mascota = @id", conn);
                 cmd.Parameters.AddWithValue("@id", mascotaSeleccionadaId);
 
                 conn.Open();
