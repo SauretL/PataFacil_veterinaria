@@ -35,19 +35,11 @@
             lblUsuario = new Label();
             tabPrincipal = new TabControl();
             tabClientes = new TabPage();
-            ucClientesMascotas1 = new PataFacil.Formularios.Recepcionista.ucClientesMascotas();
             tabTurnos = new TabPage();
-            ucTurnos1 = new PataFacil.Formularios.Recepcionista.ucTurnos();
             tabUrgencias = new TabPage();
-            ucUrgencias1 = new PataFacil.Formularios.Recepcionista.ucUrgencias();
             tabCobros = new TabPage();
-            ucCobros1 = new PataFacil.Formularios.Recepcionista.ucCobros();
             pnlCabecera.SuspendLayout();
             tabPrincipal.SuspendLayout();
-            tabClientes.SuspendLayout();
-            tabTurnos.SuspendLayout();
-            tabUrgencias.SuspendLayout();
-            tabCobros.SuspendLayout();
             SuspendLayout();
             // 
             // pnlCabecera
@@ -76,7 +68,7 @@
             lblTitulo.AutoSize = true;
             lblTitulo.Font = new Font("Segoe UI", 14.25F, FontStyle.Bold, GraphicsUnit.Point, 0);
             lblTitulo.ForeColor = Color.White;
-            lblTitulo.Location = new Point(20, 15);
+            lblTitulo.Location = new Point(22, 16);
             lblTitulo.Name = "lblTitulo";
             lblTitulo.Size = new Size(226, 25);
             lblTitulo.TabIndex = 0;
@@ -103,35 +95,22 @@
             tabPrincipal.Location = new Point(0, 56);
             tabPrincipal.Name = "tabPrincipal";
             tabPrincipal.SelectedIndex = 0;
-            tabPrincipal.Size = new Size(1114, 670);
+            tabPrincipal.Size = new Size(1114, 645);
             tabPrincipal.TabIndex = 1;
             // 
             // tabClientes
             // 
             tabClientes.BackColor = Color.FromArgb(244, 241, 236);
-            tabClientes.Controls.Add(ucClientesMascotas1);
             tabClientes.Location = new Point(4, 26);
             tabClientes.Name = "tabClientes";
             tabClientes.Padding = new Padding(3);
-            tabClientes.Size = new Size(1106, 640);
+            tabClientes.Size = new Size(1106, 615);
             tabClientes.TabIndex = 0;
             tabClientes.Text = "Clientes y Mascotas";
-            // 
-            // ucClientesMascotas1
-            // 
-            ucClientesMascotas1.BackColor = Color.FromArgb(244, 241, 236);
-            ucClientesMascotas1.Dock = DockStyle.Fill;
-            ucClientesMascotas1.Font = new Font("Segoe UI", 10F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            ucClientesMascotas1.Location = new Point(3, 3);
-            ucClientesMascotas1.Name = "ucClientesMascotas1";
-            ucClientesMascotas1.Size = new Size(1100, 634);
-            ucClientesMascotas1.TabIndex = 0;
-            ucClientesMascotas1.Load += ucClientesMascotas1_Load;
             // 
             // tabTurnos
             // 
             tabTurnos.BackColor = Color.FromArgb(244, 241, 236);
-            tabTurnos.Controls.Add(ucTurnos1);
             tabTurnos.Location = new Point(4, 24);
             tabTurnos.Name = "tabTurnos";
             tabTurnos.Padding = new Padding(3);
@@ -139,63 +118,30 @@
             tabTurnos.TabIndex = 1;
             tabTurnos.Text = "Turnos";
             // 
-            // ucTurnos1
-            // 
-            ucTurnos1.BackColor = Color.FromArgb(244, 241, 236);
-            ucTurnos1.Dock = DockStyle.Fill;
-            ucTurnos1.Font = new Font("Segoe UI", 10F);
-            ucTurnos1.Location = new Point(3, 3);
-            ucTurnos1.Name = "ucTurnos1";
-            ucTurnos1.Size = new Size(1100, 636);
-            ucTurnos1.TabIndex = 0;
-            ucTurnos1.Load += ucTurnos1_Load;
-            // 
             // tabUrgencias
             // 
             tabUrgencias.BackColor = Color.FromArgb(244, 241, 236);
-            tabUrgencias.Controls.Add(ucUrgencias1);
-            tabUrgencias.Location = new Point(4, 26);
+            tabUrgencias.Location = new Point(4, 24);
             tabUrgencias.Name = "tabUrgencias";
-            tabUrgencias.Size = new Size(1106, 640);
+            tabUrgencias.Size = new Size(1106, 642);
             tabUrgencias.TabIndex = 2;
             tabUrgencias.Text = "Urgencias";
-            // 
-            // ucUrgencias1
-            // 
-            ucUrgencias1.BackColor = Color.FromArgb(244, 241, 236);
-            ucUrgencias1.Dock = DockStyle.Fill;
-            ucUrgencias1.Font = new Font("Segoe UI", 10F);
-            ucUrgencias1.Location = new Point(0, 0);
-            ucUrgencias1.Name = "ucUrgencias1";
-            ucUrgencias1.Size = new Size(1106, 640);
-            ucUrgencias1.TabIndex = 0;
             // 
             // tabCobros
             // 
             tabCobros.BackColor = Color.FromArgb(244, 241, 236);
-            tabCobros.Controls.Add(ucCobros1);
             tabCobros.Location = new Point(4, 24);
             tabCobros.Name = "tabCobros";
             tabCobros.Size = new Size(1106, 642);
             tabCobros.TabIndex = 3;
             tabCobros.Text = "Cobros";
             // 
-            // ucCobros1
-            // 
-            ucCobros1.BackColor = Color.FromArgb(244, 241, 236);
-            ucCobros1.Dock = DockStyle.Fill;
-            ucCobros1.Font = new Font("Segoe UI", 10F);
-            ucCobros1.Location = new Point(0, 0);
-            ucCobros1.Name = "ucCobros1";
-            ucCobros1.Size = new Size(1106, 642);
-            ucCobros1.TabIndex = 0;
-            // 
             // frmRecepcionista
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.White;
-            ClientSize = new Size(1114, 726);
+            ClientSize = new Size(1114, 701);
             Controls.Add(tabPrincipal);
             Controls.Add(pnlCabecera);
             Font = new Font("Segoe UI", 10F, FontStyle.Regular, GraphicsUnit.Point, 0);
@@ -208,10 +154,6 @@
             pnlCabecera.ResumeLayout(false);
             pnlCabecera.PerformLayout();
             tabPrincipal.ResumeLayout(false);
-            tabClientes.ResumeLayout(false);
-            tabTurnos.ResumeLayout(false);
-            tabUrgencias.ResumeLayout(false);
-            tabCobros.ResumeLayout(false);
             ResumeLayout(false);
         }
 
