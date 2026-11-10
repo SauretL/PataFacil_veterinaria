@@ -28,7 +28,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmRecepcionista));
             pnlCabecera = new Panel();
             btnCerrarSesion = new Button();
             lblTitulo = new Label();
@@ -38,8 +37,10 @@
             tabTurnos = new TabPage();
             tabUrgencias = new TabPage();
             tabCobros = new TabPage();
+            ucClientesMascotas1 = new PataFacil.Formularios.Recepcionista.ucClientesMascotas();
             pnlCabecera.SuspendLayout();
             tabPrincipal.SuspendLayout();
+            tabClientes.SuspendLayout();
             SuspendLayout();
             // 
             // pnlCabecera
@@ -101,6 +102,7 @@
             // tabClientes
             // 
             tabClientes.BackColor = Color.FromArgb(244, 241, 236);
+            tabClientes.Controls.Add(ucClientesMascotas1);
             tabClientes.Location = new Point(4, 26);
             tabClientes.Name = "tabClientes";
             tabClientes.Padding = new Padding(3);
@@ -111,10 +113,10 @@
             // tabTurnos
             // 
             tabTurnos.BackColor = Color.FromArgb(244, 241, 236);
-            tabTurnos.Location = new Point(4, 24);
+            tabTurnos.Location = new Point(4, 26);
             tabTurnos.Name = "tabTurnos";
             tabTurnos.Padding = new Padding(3);
-            tabTurnos.Size = new Size(1106, 642);
+            tabTurnos.Size = new Size(1106, 615);
             tabTurnos.TabIndex = 1;
             tabTurnos.Text = "Turnos";
             // 
@@ -123,7 +125,7 @@
             tabUrgencias.BackColor = Color.FromArgb(244, 241, 236);
             tabUrgencias.Location = new Point(4, 24);
             tabUrgencias.Name = "tabUrgencias";
-            tabUrgencias.Size = new Size(1106, 642);
+            tabUrgencias.Size = new Size(1106, 617);
             tabUrgencias.TabIndex = 2;
             tabUrgencias.Text = "Urgencias";
             // 
@@ -132,9 +134,18 @@
             tabCobros.BackColor = Color.FromArgb(244, 241, 236);
             tabCobros.Location = new Point(4, 24);
             tabCobros.Name = "tabCobros";
-            tabCobros.Size = new Size(1106, 642);
+            tabCobros.Size = new Size(1106, 617);
             tabCobros.TabIndex = 3;
             tabCobros.Text = "Cobros";
+            // 
+            // ucClientesMascotas1
+            // 
+            ucClientesMascotas1.BackColor = Color.FromArgb(244, 241, 236);
+            ucClientesMascotas1.Font = new Font("Segoe UI", 10F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            ucClientesMascotas1.Location = new Point(-2, 0);
+            ucClientesMascotas1.Name = "ucClientesMascotas1";
+            ucClientesMascotas1.Size = new Size(1108, 612);
+            ucClientesMascotas1.TabIndex = 0;
             // 
             // frmRecepcionista
             // 
@@ -146,7 +157,6 @@
             Controls.Add(pnlCabecera);
             Font = new Font("Segoe UI", 10F, FontStyle.Regular, GraphicsUnit.Point, 0);
             FormBorderStyle = FormBorderStyle.FixedSingle;
-            Icon = (Icon)resources.GetObject("$this.Icon");
             MaximizeBox = false;
             Name = "frmRecepcionista";
             StartPosition = FormStartPosition.CenterScreen;
@@ -154,6 +164,7 @@
             pnlCabecera.ResumeLayout(false);
             pnlCabecera.PerformLayout();
             tabPrincipal.ResumeLayout(false);
+            tabClientes.ResumeLayout(false);
             ResumeLayout(false);
         }
 
@@ -168,5 +179,6 @@
         private TabPage tabTurnos;
         private TabPage tabUrgencias;
         private TabPage tabCobros;
+        private Formularios.Recepcionista.ucClientesMascotas ucClientesMascotas1;
     }
 }
