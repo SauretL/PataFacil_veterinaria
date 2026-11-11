@@ -101,7 +101,6 @@ namespace PataFacil.Formularios.Recepcionista
             {
                 int indexFila = 0;
 
-                // Si se registró un cliente nuevo, buscamos su índice exacto en la grilla
                 if (idClienteASeleccionar != -1)
                 {
                     for (int i = 0; i < dgvClientes.Rows.Count; i++)
@@ -114,11 +113,9 @@ namespace PataFacil.Formularios.Recepcionista
                     }
                 }
 
-                // Limpiar selección previa y enfocar la fila deseada visualmente
                 dgvClientes.ClearSelection();
                 dgvClientes.Rows[indexFila].Selected = true;
 
-                // Establecer la celda activa para mover el foco azul de Windows Forms
                 for (int c = 0; c < dgvClientes.Columns.Count; c++)
                 {
                     if (dgvClientes.Columns[c].Visible)
@@ -137,8 +134,15 @@ namespace PataFacil.Formularios.Recepcionista
                     txtTelefono.Text = drv["Telefono"]?.ToString() ?? string.Empty;
                     txtEmail.Text = drv["Email"]?.ToString() ?? string.Empty;
 
-                    // Carga las mascotas del cliente enfocado (por ejemplo, Laucha para Carlos Lima)
-                    CargarMascotasDelCliente(clienteSeleccionadoId);
+                    // Si hay filtro activo de búsqueda, carga las mascotas de TODOS los clientes filtrados
+                    if (!string.IsNullOrWhiteSpace(filtro))
+                    {
+                        CargarMascotasPorFiltroCliente(filtro);
+                    }
+                    else
+                    {
+                        CargarMascotasDelCliente(clienteSeleccionadoId);
+                    }
                 }
             }
             else
@@ -154,6 +158,30 @@ namespace PataFacil.Formularios.Recepcionista
 
             using var cmd = new SqlCommand(query, conn);
             cmd.Parameters.AddWithValue("@idCliente", idCliente);
+
+            using var da = new SqlDataAdapter(cmd);
+            var dt = new DataTable();
+
+            da.Fill(dt);
+
+            dgvMascotas.AutoGenerateColumns = false;
+            dgvMascotas.DataSource = dt;
+
+            if (dgvMascotas.Columns["ID"] != null)
+                dgvMascotas.Columns["ID"].Visible = false;
+        }
+
+        // Carga todas las mascotas pertenecientes a cualquier cliente que coincida con la búsqueda
+        private void CargarMascotasPorFiltroCliente(string filtro)
+        {
+            using var conn = new SqlConnection(connectionString);
+            string query = @"SELECT m.IdMascota AS ID, m.Nombre AS Nombre, m.Especie AS Especie, m.Raza AS Raza, m.Sexo AS Sexo, m.FechaNacimiento AS Nacimiento 
+                            FROM Mascota m
+                            INNER JOIN Cliente c ON m.IdCliente = c.IdCliente
+                            WHERE (c.Nombre LIKE @filtro OR c.Apellido LIKE @filtro OR c.DNI LIKE @filtro)";
+
+            using var cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@filtro", $"%{filtro}%");
 
             using var da = new SqlDataAdapter(cmd);
             var dt = new DataTable();
@@ -190,6 +218,7 @@ namespace PataFacil.Formularios.Recepcionista
                     txtTelefono.Text = drv["Telefono"]?.ToString() ?? string.Empty;
                     txtEmail.Text = drv["Email"]?.ToString() ?? string.Empty;
 
+                    // Al hacer clic manual sobre un cliente individual, filtra solo sus mascotas
                     CargarMascotasDelCliente(clienteSeleccionadoId);
                 }
             }
@@ -264,8 +293,6 @@ namespace PataFacil.Formularios.Recepcionista
                 MessageBox.Show("Cliente y mascota registrados correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
                 LimpiarCampos(limpiarGrillaMascotas: false);
-
-                // Refresca la lista y enfoca directamente la fila del nuevo cliente registrado
                 CargarClientes(idClienteASeleccionar: idNuevoCliente);
             }
             catch (Exception ex)
