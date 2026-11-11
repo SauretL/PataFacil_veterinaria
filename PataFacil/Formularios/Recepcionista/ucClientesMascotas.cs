@@ -24,11 +24,11 @@ namespace PataFacil.Formularios.Recepcionista
         {
             InitializeComponent();
 
-            // Vinculación del evento Click por seguridad
+            // Vinculación de eventos por seguridad
             btnBajaCliente.Click -= btnDarBajaCliente_Click;
             btnBajaCliente.Click += btnDarBajaCliente_Click;
 
-            // Enlace de eventos para impedir el resaltado azul
+            // Impedir el resaltado azul en las grillas
             dgvClientes.SelectionChanged += DesactivarSeleccionClientes;
             dgvMascotas.SelectionChanged += DesactivarSeleccionMascotas;
 
@@ -389,36 +389,87 @@ namespace PataFacil.Formularios.Recepcionista
             }
         }
 
+        // ==========================================
+        // BOTÓN MODIFICAR (BASADO EN DNI ÚNICO)
+        // ==========================================
         private void btnModificar_Click(object sender, EventArgs e)
         {
-            if (clienteSeleccionadoId == -1)
+            string dniIngresado = txtDni.Text.Trim();
+            string nombreIngresado = txtNombre.Text.Trim();
+            string apellidoIngresado = txtApellido.Text.Trim();
+            string telefonoIngresado = txtTelefono.Text.Trim();
+
+            // 1. Validar que se haya ingresado el DNI (clave de búsqueda)
+            if (string.IsNullOrWhiteSpace(dniIngresado))
             {
-                MessageBox.Show("Seleccione un cliente de la tabla para modificar.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Por favor, ingrese el DNI del cliente a modificar.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            // 2. Validar campos obligatorios del cliente
+            if (string.IsNullOrWhiteSpace(nombreIngresado) ||
+                string.IsNullOrWhiteSpace(apellidoIngresado) ||
+                string.IsNullOrWhiteSpace(telefonoIngresado))
+            {
+                MessageBox.Show(
+                    "Para modificar un cliente debe completar los campos obligatorios:\n- Nombre\n- Apellido\n- Teléfono",
+                    "Atención - Campos incompletos",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
                 return;
             }
 
             using var conn = new SqlConnection(connectionString);
             conn.Open();
+
+            // 3. Buscar al cliente en la Base de Datos por DNI
+            int idClienteAModificar = -1;
+            string queryBuscarId = "SELECT IdCliente FROM Cliente WHERE DNI = @dni";
+            using (var cmdBuscar = new SqlCommand(queryBuscarId, conn))
+            {
+                cmdBuscar.Parameters.AddWithValue("@dni", dniIngresado);
+                object res = cmdBuscar.ExecuteScalar();
+
+                if (res != null && res != DBNull.Value)
+                {
+                    idClienteAModificar = Convert.ToInt32(res);
+                }
+                else
+                {
+                    MessageBox.Show($"No se encontró ningún cliente registrado con el DNI '{dniIngresado}'.", "Cliente no encontrado", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+            }
+
+            // 4. Iniciar transacción para actualizar los datos
             using SqlTransaction transaction = conn.BeginTransaction();
 
             try
             {
-                string queryCliente = "UPDATE Cliente SET Nombre=@nombre, Apellido=@apellido, DNI=@dni, Telefono=@telefono, Email=@email WHERE IdCliente=@id";
-                using var cmdCliente = new SqlCommand(queryCliente, conn, transaction);
-                cmdCliente.Parameters.AddWithValue("@id", clienteSeleccionadoId);
-                cmdCliente.Parameters.AddWithValue("@nombre", txtNombre.Text.Trim());
-                cmdCliente.Parameters.AddWithValue("@apellido", txtApellido.Text.Trim());
-                cmdCliente.Parameters.AddWithValue("@dni", txtDni.Text.Trim());
-                cmdCliente.Parameters.AddWithValue("@telefono", txtTelefono.Text.Trim());
-                cmdCliente.Parameters.AddWithValue("@email", string.IsNullOrWhiteSpace(txtEmail.Text) ? DBNull.Value : txtEmail.Text.Trim());
-                cmdCliente.ExecuteNonQuery();
+                // Actualizar datos personales y de contacto del cliente (mantiene intacta la relación de sus mascotas)
+                string queryUpdateCliente = @"UPDATE Cliente 
+                                              SET Nombre = @nombre, Apellido = @apellido, Telefono = @telefono, Email = @email 
+                                              WHERE IdCliente = @id";
 
-                if (mascotaSeleccionadaId != -1)
+                using var cmdUpdate = new SqlCommand(queryUpdateCliente, conn, transaction);
+                cmdUpdate.Parameters.AddWithValue("@id", idClienteAModificar);
+                cmdUpdate.Parameters.AddWithValue("@nombre", nombreIngresado);
+                cmdUpdate.Parameters.AddWithValue("@apellido", apellidoIngresado);
+                cmdUpdate.Parameters.AddWithValue("@telefono", telefonoIngresado);
+                cmdUpdate.Parameters.AddWithValue("@email", string.IsNullOrWhiteSpace(txtEmail.Text) ? DBNull.Value : txtEmail.Text.Trim());
+                cmdUpdate.ExecuteNonQuery();
+
+                // Si además se indicó/seleccionó una mascota existente para modificar sus características (Especie, Raza, Sexo, Nacimiento)
+                string nombreMascota = txtNombreMascota.Text.Trim();
+                if (!string.IsNullOrWhiteSpace(nombreMascota) && cmbEspecie.SelectedIndex != -1 && cmbSexo.SelectedIndex != -1)
                 {
-                    string queryMascota = "UPDATE Mascota SET Nombre=@nombre, Especie=@especie, Raza=@raza, Sexo=@sexo, FechaNacimiento=@nacimiento WHERE IdMascota=@id";
-                    using var cmdMascota = new SqlCommand(queryMascota, conn, transaction);
-                    cmdMascota.Parameters.AddWithValue("@id", mascotaSeleccionadaId);
-                    cmdMascota.Parameters.AddWithValue("@nombre", txtNombreMascota.Text.Trim());
+                    string queryUpdateMascota = @"UPDATE Mascota 
+                                                  SET Especie = @especie, Raza = @raza, Sexo = @sexo, FechaNacimiento = @nacimiento 
+                                                  WHERE IdCliente = @idCliente AND Nombre = @nombreMascota";
+
+                    using var cmdMascota = new SqlCommand(queryUpdateMascota, conn, transaction);
+                    cmdMascota.Parameters.AddWithValue("@idCliente", idClienteAModificar);
+                    cmdMascota.Parameters.AddWithValue("@nombreMascota", nombreMascota);
                     cmdMascota.Parameters.AddWithValue("@especie", cmbEspecie.SelectedItem?.ToString() ?? string.Empty);
                     cmdMascota.Parameters.AddWithValue("@raza", string.IsNullOrWhiteSpace(txtRaza.Text) ? DBNull.Value : txtRaza.Text.Trim());
                     cmdMascota.Parameters.AddWithValue("@sexo", cmbSexo.SelectedItem?.ToString() ?? string.Empty);
@@ -427,19 +478,20 @@ namespace PataFacil.Formularios.Recepcionista
                 }
 
                 transaction.Commit();
-                MessageBox.Show("Datos actualizados con éxito.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show($"Datos del cliente con DNI '{dniIngresado}' actualizados correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
+                LimpiarCampos(limpiarGrillaMascotas: false);
                 CargarClientes();
             }
             catch (Exception ex)
             {
                 transaction.Rollback();
-                MessageBox.Show("Error al actualizar: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Error al actualizar en la base de datos: " + ex.Message, "Error BD", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
         // ==========================================
-        // DAR DE BAJA (PERMITE ELEGIR SI BORRAR SOLO LA MASCOTA O TAMBIÉN AL CLIENTE)
+        // DAR DE BAJA
         // ==========================================
         private void btnDarBajaCliente_Click(object sender, EventArgs e)
         {
@@ -462,7 +514,6 @@ namespace PataFacil.Formularios.Recepcionista
             using var conn = new SqlConnection(connectionString);
             conn.Open();
 
-            // Buscar ID del cliente si no viene de una selección activa
             if (clienteSeleccionadoId == -1)
             {
                 string queryBuscarId = "SELECT TOP 1 IdCliente FROM Cliente WHERE Nombre = @nom AND Apellido = @ape";
@@ -482,7 +533,6 @@ namespace PataFacil.Formularios.Recepcionista
                 }
             }
 
-            // Validar la relación entre el cliente y la mascota
             int idMascotaAEliminar = -1;
             string queryValidarMascota = "SELECT IdMascota FROM Mascota WHERE IdCliente = @idCliente AND Nombre = @nombreMascota";
             using (var cmdValidar = new SqlCommand(queryValidarMascota, conn))
@@ -504,7 +554,6 @@ namespace PataFacil.Formularios.Recepcionista
                 idMascotaAEliminar = Convert.ToInt32(resMascota);
             }
 
-            // Preguntar al usuario el alcance de la baja (Solo mascota vs Cliente completo)
             DialogResult dr = MessageBox.Show(
                 $"¿Desea dar de baja únicamente a la mascota '{nombreMascota}'?\n\n" +
                 $"• [Sí] -> Elimina SOLO a la mascota '{nombreMascota}' (conserva al cliente).\n" +
@@ -522,7 +571,6 @@ namespace PataFacil.Formularios.Recepcionista
             {
                 if (dr == DialogResult.Yes)
                 {
-                    // OPCIÓN 1: Borrar ÚNICAMENTE la mascota seleccionada
                     using var cmdM = new SqlCommand("DELETE FROM Mascota WHERE IdMascota = @idMascota", conn, transaction);
                     cmdM.Parameters.AddWithValue("@idMascota", idMascotaAEliminar);
                     cmdM.ExecuteNonQuery();
@@ -532,7 +580,6 @@ namespace PataFacil.Formularios.Recepcionista
                 }
                 else if (dr == DialogResult.No)
                 {
-                    // OPCIÓN 2: Borrar al cliente y a todas sus mascotas
                     using var cmdM = new SqlCommand("DELETE FROM Mascota WHERE IdCliente = @idCliente", conn, transaction);
                     cmdM.Parameters.AddWithValue("@idCliente", clienteSeleccionadoId);
                     cmdM.ExecuteNonQuery();
