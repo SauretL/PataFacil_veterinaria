@@ -28,8 +28,9 @@
         /// </summary>
         private void InitializeComponent()
         {
-            DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
             grpUrgencias = new GroupBox();
+            btnConsultarTurnos = new Button();
             lblFechaHoraUrgencia = new Label();
             txtMotivo = new TextBox();
             lblMotivoUrgencia = new Label();
@@ -37,22 +38,24 @@
             lblVeterinarioUrgencia = new Label();
             lblDuenoUrgencia = new Label();
             lblMascotaUrgencia = new Label();
-            this.btnBuscarMascota = new Button();
+            btnBuscarMascota = new Button();
             dgvUrgenciasHoy = new DataGridView();
-            colId = new DataGridViewTextBoxColumn();
+            btnLimpiar = new Button();
+            btnRegistrarUrgencia = new Button();
             colHora = new DataGridViewTextBoxColumn();
+            Fecha = new DataGridViewTextBoxColumn();
             colMascota = new DataGridViewTextBoxColumn();
             colDueno = new DataGridViewTextBoxColumn();
             colVeterinario = new DataGridViewTextBoxColumn();
             colMotivo = new DataGridViewTextBoxColumn();
-            btnLimpiar = new Button();
-            btnRegistrarUrgencia = new Button();
+            Estado = new DataGridViewTextBoxColumn();
             grpUrgencias.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvUrgenciasHoy).BeginInit();
             SuspendLayout();
             // 
             // grpUrgencias
             // 
+            grpUrgencias.Controls.Add(btnConsultarTurnos);
             grpUrgencias.Controls.Add(lblFechaHoraUrgencia);
             grpUrgencias.Controls.Add(txtMotivo);
             grpUrgencias.Controls.Add(lblMotivoUrgencia);
@@ -60,13 +63,27 @@
             grpUrgencias.Controls.Add(lblVeterinarioUrgencia);
             grpUrgencias.Controls.Add(lblDuenoUrgencia);
             grpUrgencias.Controls.Add(lblMascotaUrgencia);
-            grpUrgencias.Controls.Add(this.btnBuscarMascota);
+            grpUrgencias.Controls.Add(btnBuscarMascota);
             grpUrgencias.Location = new Point(20, 11);
             grpUrgencias.Name = "grpUrgencias";
             grpUrgencias.Size = new Size(520, 340);
             grpUrgencias.TabIndex = 0;
             grpUrgencias.TabStop = false;
             grpUrgencias.Text = "Urgencia (sin turno previo)";
+            // 
+            // btnConsultarTurnos
+            // 
+            btnConsultarTurnos.BackColor = Color.FromArgb(228, 224, 218);
+            btnConsultarTurnos.Cursor = Cursors.Hand;
+            btnConsultarTurnos.FlatAppearance.BorderSize = 0;
+            btnConsultarTurnos.FlatStyle = FlatStyle.Flat;
+            btnConsultarTurnos.ForeColor = Color.FromArgb(34, 34, 34);
+            btnConsultarTurnos.Location = new Point(340, 24);
+            btnConsultarTurnos.Name = "btnConsultarTurnos";
+            btnConsultarTurnos.Size = new Size(140, 36);
+            btnConsultarTurnos.TabIndex = 27;
+            btnConsultarTurnos.Text = "Consultar turnos";
+            btnConsultarTurnos.UseVisualStyleBackColor = false;
             // 
             // lblFechaHoraUrgencia
             // 
@@ -132,17 +149,17 @@
             // 
             // btnBuscarMascota
             // 
-            this.btnBuscarMascota.BackColor = Color.FromArgb(228, 224, 218);
-            this.btnBuscarMascota.Cursor = Cursors.Hand;
-            this.btnBuscarMascota.FlatAppearance.BorderSize = 0;
-            this.btnBuscarMascota.FlatStyle = FlatStyle.Flat;
-            this.btnBuscarMascota.ForeColor = Color.FromArgb(34, 34, 34);
-            this.btnBuscarMascota.Location = new Point(15, 23);
-            this.btnBuscarMascota.Name = "btnBuscarMascota";
-            this.btnBuscarMascota.Size = new Size(140, 36);
-            this.btnBuscarMascota.TabIndex = 16;
-            this.btnBuscarMascota.Text = "Buscar mascota";
-            this.btnBuscarMascota.UseVisualStyleBackColor = false;
+            btnBuscarMascota.BackColor = Color.FromArgb(228, 224, 218);
+            btnBuscarMascota.Cursor = Cursors.Hand;
+            btnBuscarMascota.FlatAppearance.BorderSize = 0;
+            btnBuscarMascota.FlatStyle = FlatStyle.Flat;
+            btnBuscarMascota.ForeColor = Color.FromArgb(34, 34, 34);
+            btnBuscarMascota.Location = new Point(15, 23);
+            btnBuscarMascota.Name = "btnBuscarMascota";
+            btnBuscarMascota.Size = new Size(140, 36);
+            btnBuscarMascota.TabIndex = 16;
+            btnBuscarMascota.Text = "Buscar mascota";
+            btnBuscarMascota.UseVisualStyleBackColor = false;
             // 
             // dgvUrgenciasHoy
             // 
@@ -151,61 +168,24 @@
             dgvUrgenciasHoy.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             dgvUrgenciasHoy.BackgroundColor = Color.FromArgb(244, 241, 236);
             dgvUrgenciasHoy.ClipboardCopyMode = DataGridViewClipboardCopyMode.EnableWithoutHeaderText;
-            dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle2.BackColor = Color.FromArgb(228, 224, 218);
-            dataGridViewCellStyle2.Font = new Font("Segoe UI", 9F);
-            dataGridViewCellStyle2.ForeColor = SystemColors.WindowText;
-            dataGridViewCellStyle2.SelectionBackColor = SystemColors.Highlight;
-            dataGridViewCellStyle2.SelectionForeColor = SystemColors.HighlightText;
-            dataGridViewCellStyle2.WrapMode = DataGridViewTriState.True;
-            dgvUrgenciasHoy.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle1.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.BackColor = Color.FromArgb(228, 224, 218);
+            dataGridViewCellStyle1.Font = new Font("Segoe UI", 9F);
+            dataGridViewCellStyle1.ForeColor = SystemColors.WindowText;
+            dataGridViewCellStyle1.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = DataGridViewTriState.True;
+            dgvUrgenciasHoy.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             dgvUrgenciasHoy.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dgvUrgenciasHoy.Columns.AddRange(new DataGridViewColumn[] { colId, colHora, colMascota, colDueno, colVeterinario, colMotivo });
+            dgvUrgenciasHoy.Columns.AddRange(new DataGridViewColumn[] { colHora, Fecha, colMascota, colDueno, colVeterinario, colMotivo, Estado });
             dgvUrgenciasHoy.EnableHeadersVisualStyles = false;
-            dgvUrgenciasHoy.Location = new Point(560, 11);
+            dgvUrgenciasHoy.Location = new Point(546, 11);
             dgvUrgenciasHoy.MultiSelect = false;
             dgvUrgenciasHoy.Name = "dgvUrgenciasHoy";
             dgvUrgenciasHoy.ReadOnly = true;
             dgvUrgenciasHoy.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dgvUrgenciasHoy.Size = new Size(510, 340);
+            dgvUrgenciasHoy.Size = new Size(524, 340);
             dgvUrgenciasHoy.TabIndex = 18;
-            // 
-            // colId
-            // 
-            colId.HeaderText = "ID";
-            colId.Name = "colId";
-            colId.ReadOnly = true;
-            colId.Visible = false;
-            // 
-            // colHora
-            // 
-            colHora.HeaderText = "Hora";
-            colHora.Name = "colHora";
-            colHora.ReadOnly = true;
-            // 
-            // colMascota
-            // 
-            colMascota.HeaderText = "Mascota";
-            colMascota.Name = "colMascota";
-            colMascota.ReadOnly = true;
-            // 
-            // colDueno
-            // 
-            colDueno.HeaderText = "Dueño";
-            colDueno.Name = "colDueno";
-            colDueno.ReadOnly = true;
-            // 
-            // colVeterinario
-            // 
-            colVeterinario.HeaderText = "Veterinario";
-            colVeterinario.Name = "colVeterinario";
-            colVeterinario.ReadOnly = true;
-            // 
-            // colMotivo
-            // 
-            colMotivo.HeaderText = "Motivo";
-            colMotivo.Name = "colMotivo";
-            colMotivo.ReadOnly = true;
             // 
             // btnLimpiar
             // 
@@ -235,6 +215,48 @@
             btnRegistrarUrgencia.Text = "Registrar Urgencia";
             btnRegistrarUrgencia.UseVisualStyleBackColor = false;
             // 
+            // colHora
+            // 
+            colHora.HeaderText = "Hora";
+            colHora.Name = "colHora";
+            colHora.ReadOnly = true;
+            // 
+            // Fecha
+            // 
+            Fecha.HeaderText = "Fecha";
+            Fecha.Name = "Fecha";
+            Fecha.ReadOnly = true;
+            // 
+            // colMascota
+            // 
+            colMascota.HeaderText = "Mascota";
+            colMascota.Name = "colMascota";
+            colMascota.ReadOnly = true;
+            // 
+            // colDueno
+            // 
+            colDueno.HeaderText = "Dueño";
+            colDueno.Name = "colDueno";
+            colDueno.ReadOnly = true;
+            // 
+            // colVeterinario
+            // 
+            colVeterinario.HeaderText = "Veterinario";
+            colVeterinario.Name = "colVeterinario";
+            colVeterinario.ReadOnly = true;
+            // 
+            // colMotivo
+            // 
+            colMotivo.HeaderText = "Motivo";
+            colMotivo.Name = "colMotivo";
+            colMotivo.ReadOnly = true;
+            // 
+            // Estado
+            // 
+            Estado.HeaderText = "Estado";
+            Estado.Name = "Estado";
+            Estado.ReadOnly = true;
+            // 
             // ucUrgencias
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
@@ -257,12 +279,6 @@
 
         private GroupBox grpUrgencias;
         private DataGridView dgvUrgenciasHoy;
-        private DataGridViewTextBoxColumn colId;
-        private DataGridViewTextBoxColumn colHora;
-        private DataGridViewTextBoxColumn colMascota;
-        private DataGridViewTextBoxColumn colDueno;
-        private DataGridViewTextBoxColumn colVeterinario;
-        private DataGridViewTextBoxColumn colMotivo;
         private Label lblDueno;
         private Label lblMascota;
         private Button btnBuscarMascota;
@@ -276,5 +292,13 @@
         private Label lblVeterinarioUrgencia;
         private Button btnLimpiar;
         private Button btnRegistrarUrgencia;
+        private Button btnConsultarTurnos;
+        private DataGridViewTextBoxColumn colHora;
+        private DataGridViewTextBoxColumn Fecha;
+        private DataGridViewTextBoxColumn colMascota;
+        private DataGridViewTextBoxColumn colDueno;
+        private DataGridViewTextBoxColumn colVeterinario;
+        private DataGridViewTextBoxColumn colMotivo;
+        private DataGridViewTextBoxColumn Estado;
     }
 }
