@@ -10,7 +10,10 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Data.SqlClient" Version="7.1.1" />
+<<<<<<< HEAD
     <PackageReference Include="System.Data.SqlClient" Version="4.9.1" />
+=======
+>>>>>>> origin/feature/login
   </ItemGroup>
 
 </Project>
