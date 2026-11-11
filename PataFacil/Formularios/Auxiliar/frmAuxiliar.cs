@@ -12,6 +12,15 @@ namespace PataFacil
 {
     public partial class frmAuxiliar : Form
     {
+
+        // Productos de prueba
+        private readonly Dictionary<string, (string Clave, string Rol)> productos = new()
+        {
+            ["recepcion"] = ("1234", "Recepcionista"),
+            ["vet"] = ("1234", "Veterinario"),
+            ["aux"] = ("1234", "Auxiliar")
+        };
+
         public frmAuxiliar()
         {
             InitializeComponent();
@@ -29,6 +38,11 @@ namespace PataFacil
             login.Show();
 
             this.Hide();
+        }
+
+        private void txtBuscar_TextChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }
