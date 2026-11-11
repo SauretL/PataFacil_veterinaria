@@ -28,7 +28,7 @@ namespace PataFacil.Formularios.Recepcionista
             btnBajaCliente.Click -= btnDarBajaCliente_Click;
             btnBajaCliente.Click += btnDarBajaCliente_Click;
 
-            // Impedir el resaltado azul en las grillas
+            // Enlace de eventos para impedir el resaltado azul
             dgvClientes.SelectionChanged += DesactivarSeleccionClientes;
             dgvMascotas.SelectionChanged += DesactivarSeleccionMascotas;
 
@@ -291,76 +291,133 @@ namespace PataFacil.Formularios.Recepcionista
         // ==========================================
         private void btnRegistrar_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(txtNombre.Text) || string.IsNullOrWhiteSpace(txtApellido.Text) ||
-                string.IsNullOrWhiteSpace(txtDni.Text) || string.IsNullOrWhiteSpace(txtNombreMascota.Text) ||
-                cmbEspecie.SelectedIndex == -1 || cmbSexo.SelectedIndex == -1)
+            string dniIngresado = txtDni.Text.Trim();
+            string nombreIngresado = txtNombre.Text.Trim();
+            string apellidoIngresado = txtApellido.Text.Trim();
+            string telefonoIngresado = txtTelefono.Text.Trim();
+            string nombreMascota = txtNombreMascota.Text.Trim();
+
+            if (string.IsNullOrWhiteSpace(dniIngresado))
             {
-                MessageBox.Show("Por favor complete los campos obligatorios (*).", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("El valor ingresado en el campo 'DNI' no es correcto o se encuentra vacío.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtDni.Focus();
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(nombreIngresado))
+            {
+                MessageBox.Show("El valor ingresado en el campo 'Nombre' no es correcto o se encuentra vacío.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtNombre.Focus();
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(apellidoIngresado))
+            {
+                MessageBox.Show("El valor ingresado en el campo 'Apellido' no es correcto o se encuentra vacío.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtApellido.Focus();
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(telefonoIngresado))
+            {
+                MessageBox.Show("El valor ingresado en el campo 'Teléfono' no es correcto o se encuentra vacío.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtTelefono.Focus();
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(nombreMascota))
+            {
+                MessageBox.Show("El valor ingresado en el campo 'Nombre de la Mascota' no es correcto o se encuentra vacío.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtNombreMascota.Focus();
+                return;
+            }
+
+            if (cmbEspecie.SelectedIndex == -1)
+            {
+                MessageBox.Show("Debe seleccionar una 'Especie' para la mascota.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                cmbEspecie.Focus();
+                return;
+            }
+
+            if (cmbSexo.SelectedIndex == -1)
+            {
+                MessageBox.Show("Debe seleccionar un 'Sexo' para la mascota.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                cmbSexo.Focus();
                 return;
             }
 
             using var conn = new SqlConnection(connectionString);
             conn.Open();
-            using SqlTransaction transaction = conn.BeginTransaction();
 
-            try
+            int idClienteDestino = -1;
+            string queryBuscarCliente = "SELECT IdCliente, Nombre, Apellido, Telefono, Email FROM Cliente WHERE DNI = @dni";
+            using (var cmdBuscar = new SqlCommand(queryBuscarCliente, conn))
             {
-                string dniIngresado = txtDni.Text.Trim();
-                string nombreMascota = txtNombreMascota.Text.Trim();
-                int idClienteDestino = -1;
-
-                string queryBuscarCliente = "SELECT IdCliente FROM Cliente WHERE DNI = @dni";
-                using (var cmdBuscar = new SqlCommand(queryBuscarCliente, conn, transaction))
+                cmdBuscar.Parameters.AddWithValue("@dni", dniIngresado);
+                using var dr = cmdBuscar.ExecuteReader();
+                if (dr.Read())
                 {
-                    cmdBuscar.Parameters.AddWithValue("@dni", dniIngresado);
-                    object res = cmdBuscar.ExecuteScalar();
-                    if (res != null && res != DBNull.Value)
+                    idClienteDestino = Convert.ToInt32(dr["IdCliente"]);
+
+                    string nomBD = dr["Nombre"].ToString() ?? string.Empty;
+                    string apeBD = dr["Apellido"].ToString() ?? string.Empty;
+                    string telBD = dr["Telefono"].ToString() ?? string.Empty;
+
+                    if (!nomBD.Equals(nombreIngresado, StringComparison.OrdinalIgnoreCase))
                     {
-                        idClienteDestino = Convert.ToInt32(res);
+                        MessageBox.Show($"El DNI '{dniIngresado}' ya pertenece al cliente registrado como '{nomBD} {apeBD}'. El valor ingresado en 'Nombre' no coincide.", "Incoherencia de datos", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        txtNombre.Focus();
+                        return;
+                    }
+
+                    if (!apeBD.Equals(apellidoIngresado, StringComparison.OrdinalIgnoreCase))
+                    {
+                        MessageBox.Show($"El DNI '{dniIngresado}' ya pertenece al cliente registrado como '{nomBD} {apeBD}'. El valor ingresado en 'Apellido' no coincide.", "Incoherencia de datos", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        txtApellido.Focus();
+                        return;
+                    }
+
+                    if (!telBD.Equals(telefonoIngresado, StringComparison.OrdinalIgnoreCase))
+                    {
+                        MessageBox.Show($"El DNI '{dniIngresado}' ya posee un registro guardado con el teléfono '{telBD}'. El valor ingresado en 'Teléfono' no coincide con el cliente actual.", "Incoherencia de datos", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        txtTelefono.Focus();
+                        return;
                     }
                 }
+            }
 
-                if (idClienteDestino != -1)
+            if (idClienteDestino != -1)
+            {
+                string queryExisteMascota = "SELECT COUNT(*) FROM Mascota WHERE IdCliente = @idCliente AND Nombre = @nombreMascota";
+                using var cmdValidarMascota = new SqlCommand(queryExisteMascota, conn);
+                cmdValidarMascota.Parameters.AddWithValue("@idCliente", idClienteDestino);
+                cmdValidarMascota.Parameters.AddWithValue("@nombreMascota", nombreMascota);
+
+                int existe = Convert.ToInt32(cmdValidarMascota.ExecuteScalar());
+                if (existe > 0)
                 {
-                    string queryUpdateCliente = @"UPDATE Cliente 
-                                                  SET Nombre = @nombre, Apellido = @apellido, Telefono = @telefono, Email = @email 
-                                                  WHERE IdCliente = @id";
-                    using var cmdUpdate = new SqlCommand(queryUpdateCliente, conn, transaction);
-                    cmdUpdate.Parameters.AddWithValue("@id", idClienteDestino);
-                    cmdUpdate.Parameters.AddWithValue("@nombre", txtNombre.Text.Trim());
-                    cmdUpdate.Parameters.AddWithValue("@apellido", txtApellido.Text.Trim());
-                    cmdUpdate.Parameters.AddWithValue("@telefono", txtTelefono.Text.Trim());
-                    cmdUpdate.Parameters.AddWithValue("@email", string.IsNullOrWhiteSpace(txtEmail.Text) ? DBNull.Value : txtEmail.Text.Trim());
-                    cmdUpdate.ExecuteNonQuery();
+                    MessageBox.Show($"El cliente ya posee registrada una mascota con el nombre '{nombreMascota}'.", "Mascota existente", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    txtNombreMascota.Focus();
+                    return;
                 }
-                else
+            }
+
+            using SqlTransaction transaction = conn.BeginTransaction();
+            try
+            {
+                if (idClienteDestino == -1)
                 {
                     string queryInsertCliente = @"INSERT INTO Cliente (Nombre, Apellido, DNI, Telefono, Email) 
                                                   VALUES (@nombre, @apellido, @dni, @telefono, @email); 
                                                   SELECT SCOPE_IDENTITY();";
                     using var cmdInsert = new SqlCommand(queryInsertCliente, conn, transaction);
-                    cmdInsert.Parameters.AddWithValue("@nombre", txtNombre.Text.Trim());
-                    cmdInsert.Parameters.AddWithValue("@apellido", txtApellido.Text.Trim());
+                    cmdInsert.Parameters.AddWithValue("@nombre", nombreIngresado);
+                    cmdInsert.Parameters.AddWithValue("@apellido", apellidoIngresado);
                     cmdInsert.Parameters.AddWithValue("@dni", dniIngresado);
-                    cmdInsert.Parameters.AddWithValue("@telefono", txtTelefono.Text.Trim());
+                    cmdInsert.Parameters.AddWithValue("@telefono", telefonoIngresado);
                     cmdInsert.Parameters.AddWithValue("@email", string.IsNullOrWhiteSpace(txtEmail.Text) ? DBNull.Value : txtEmail.Text.Trim());
 
                     idClienteDestino = Convert.ToInt32(cmdInsert.ExecuteScalar());
-                }
-
-                string queryExisteMascota = "SELECT COUNT(*) FROM Mascota WHERE IdCliente = @idCliente AND Nombre = @nombreMascota";
-                using (var cmdValidarMascota = new SqlCommand(queryExisteMascota, conn, transaction))
-                {
-                    cmdValidarMascota.Parameters.AddWithValue("@idCliente", idClienteDestino);
-                    cmdValidarMascota.Parameters.AddWithValue("@nombreMascota", nombreMascota);
-
-                    int existe = Convert.ToInt32(cmdValidarMascota.ExecuteScalar());
-                    if (existe > 0)
-                    {
-                        transaction.Rollback();
-                        MessageBox.Show($"El cliente ya posee registrada una mascota con el nombre '{nombreMascota}'.", "Mascota existente", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                        return;
-                    }
                 }
 
                 string queryInsertMascota = @"INSERT INTO Mascota (IdCliente, Nombre, Especie, Raza, Sexo, FechaNacimiento) 
@@ -390,7 +447,7 @@ namespace PataFacil.Formularios.Recepcionista
         }
 
         // ==========================================
-        // BOTÓN MODIFICAR (BASADO EN DNI ÚNICO)
+        // BOTÓN MODIFICAR
         // ==========================================
         private void btnModificar_Click(object sender, EventArgs e)
         {
@@ -399,30 +456,37 @@ namespace PataFacil.Formularios.Recepcionista
             string apellidoIngresado = txtApellido.Text.Trim();
             string telefonoIngresado = txtTelefono.Text.Trim();
 
-            // 1. Validar que se haya ingresado el DNI (clave de búsqueda)
             if (string.IsNullOrWhiteSpace(dniIngresado))
             {
-                MessageBox.Show("Por favor, ingrese el DNI del cliente a modificar.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("El valor ingresado en el campo 'DNI' no es correcto o se encuentra vacío.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtDni.Focus();
                 return;
             }
 
-            // 2. Validar campos obligatorios del cliente
-            if (string.IsNullOrWhiteSpace(nombreIngresado) ||
-                string.IsNullOrWhiteSpace(apellidoIngresado) ||
-                string.IsNullOrWhiteSpace(telefonoIngresado))
+            if (string.IsNullOrWhiteSpace(nombreIngresado))
             {
-                MessageBox.Show(
-                    "Para modificar un cliente debe completar los campos obligatorios:\n- Nombre\n- Apellido\n- Teléfono",
-                    "Atención - Campos incompletos",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Warning);
+                MessageBox.Show("El valor ingresado en el campo 'Nombre' no es correcto o se encuentra vacío.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtNombre.Focus();
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(apellidoIngresado))
+            {
+                MessageBox.Show("El valor ingresado en el campo 'Apellido' no es correcto o se encuentra vacío.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtApellido.Focus();
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(telefonoIngresado))
+            {
+                MessageBox.Show("El valor ingresado en el campo 'Teléfono' no es correcto o se encuentra vacío.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtTelefono.Focus();
                 return;
             }
 
             using var conn = new SqlConnection(connectionString);
             conn.Open();
 
-            // 3. Buscar al cliente en la Base de Datos por DNI
             int idClienteAModificar = -1;
             string queryBuscarId = "SELECT IdCliente FROM Cliente WHERE DNI = @dni";
             using (var cmdBuscar = new SqlCommand(queryBuscarId, conn))
@@ -441,12 +505,10 @@ namespace PataFacil.Formularios.Recepcionista
                 }
             }
 
-            // 4. Iniciar transacción para actualizar los datos
             using SqlTransaction transaction = conn.BeginTransaction();
 
             try
             {
-                // Actualizar datos personales y de contacto del cliente (mantiene intacta la relación de sus mascotas)
                 string queryUpdateCliente = @"UPDATE Cliente 
                                               SET Nombre = @nombre, Apellido = @apellido, Telefono = @telefono, Email = @email 
                                               WHERE IdCliente = @id";
@@ -459,7 +521,6 @@ namespace PataFacil.Formularios.Recepcionista
                 cmdUpdate.Parameters.AddWithValue("@email", string.IsNullOrWhiteSpace(txtEmail.Text) ? DBNull.Value : txtEmail.Text.Trim());
                 cmdUpdate.ExecuteNonQuery();
 
-                // Si además se indicó/seleccionó una mascota existente para modificar sus características (Especie, Raza, Sexo, Nacimiento)
                 string nombreMascota = txtNombreMascota.Text.Trim();
                 if (!string.IsNullOrWhiteSpace(nombreMascota) && cmbEspecie.SelectedIndex != -1 && cmbSexo.SelectedIndex != -1)
                 {
@@ -491,48 +552,105 @@ namespace PataFacil.Formularios.Recepcionista
         }
 
         // ==========================================
-        // DAR DE BAJA
+        // DAR DE BAJA (CON VALIDACIÓN DE DNI, NOMBRE, APELLIDO, TELÉFONO Y EMAIL)
         // ==========================================
         private void btnDarBajaCliente_Click(object sender, EventArgs e)
         {
+            string dniIngresado = txtDni.Text.Trim();
             string nombreCliente = txtNombre.Text.Trim();
             string apellidoCliente = txtApellido.Text.Trim();
+            string telefonoIngresado = txtTelefono.Text.Trim();
+            string emailIngresado = txtEmail.Text.Trim();
             string nombreMascota = txtNombreMascota.Text.Trim();
 
-            if (string.IsNullOrWhiteSpace(nombreCliente) ||
-                string.IsNullOrWhiteSpace(apellidoCliente) ||
-                string.IsNullOrWhiteSpace(nombreMascota))
+            // 1. Validaciones de presencia de datos obligatorios en campos
+            if (string.IsNullOrWhiteSpace(dniIngresado))
             {
-                MessageBox.Show(
-                    "Para dar de baja debe seleccionar un registro o indicar:\n- Nombre del cliente\n- Apellido del cliente\n- Nombre de la mascota",
-                    "Atención - Datos incompletos",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Warning);
+                MessageBox.Show("El valor ingresado en el campo 'DNI' no es correcto o se encuentra vacío.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtDni.Focus();
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(nombreCliente))
+            {
+                MessageBox.Show("El valor ingresado en el campo 'Nombre' no es correcto o se encuentra vacío.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtNombre.Focus();
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(apellidoCliente))
+            {
+                MessageBox.Show("El valor ingresado en el campo 'Apellido' no es correcto o se encuentra vacío.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtApellido.Focus();
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(nombreMascota))
+            {
+                MessageBox.Show("El valor ingresado en el campo 'Nombre de la Mascota' no es correcto o se encuentra vacío.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtNombreMascota.Focus();
                 return;
             }
 
             using var conn = new SqlConnection(connectionString);
             conn.Open();
 
-            if (clienteSeleccionadoId == -1)
-            {
-                string queryBuscarId = "SELECT TOP 1 IdCliente FROM Cliente WHERE Nombre = @nom AND Apellido = @ape";
-                using var cmdBuscar = new SqlCommand(queryBuscarId, conn);
-                cmdBuscar.Parameters.AddWithValue("@nom", nombreCliente);
-                cmdBuscar.Parameters.AddWithValue("@ape", apellidoCliente);
-                object resId = cmdBuscar.ExecuteScalar();
+            // 2. Buscar al cliente por DNI único en la BD y validar la coincidencia exacta de Nombre, Apellido, Teléfono y Email
+            int idClienteEncontrado = -1;
+            string queryBuscarCliente = "SELECT IdCliente, Nombre, Apellido, Telefono, Email FROM Cliente WHERE DNI = @dni";
 
-                if (resId != null && resId != DBNull.Value)
+            using (var cmdBuscar = new SqlCommand(queryBuscarCliente, conn))
+            {
+                cmdBuscar.Parameters.AddWithValue("@dni", dniIngresado);
+                using var dr = cmdBuscar.ExecuteReader();
+
+                if (dr.Read())
                 {
-                    clienteSeleccionadoId = Convert.ToInt32(resId);
+                    idClienteEncontrado = Convert.ToInt32(dr["IdCliente"]);
+                    string nomBD = dr["Nombre"].ToString() ?? string.Empty;
+                    string apeBD = dr["Apellido"].ToString() ?? string.Empty;
+                    string telBD = dr["Telefono"].ToString() ?? string.Empty;
+                    string emailBD = dr["Email"].ToString() ?? string.Empty;
+
+                    if (!nomBD.Equals(nombreCliente, StringComparison.OrdinalIgnoreCase))
+                    {
+                        MessageBox.Show($"El DNI '{dniIngresado}' pertenece a '{nomBD} {apeBD}'. El valor ingresado en el campo 'Nombre' no coincide.", "Incoherencia de datos", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        txtNombre.Focus();
+                        return;
+                    }
+
+                    if (!apeBD.Equals(apellidoCliente, StringComparison.OrdinalIgnoreCase))
+                    {
+                        MessageBox.Show($"El DNI '{dniIngresado}' pertenece a '{nomBD} {apeBD}'. El valor ingresado en el campo 'Apellido' no coincide.", "Incoherencia de datos", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        txtApellido.Focus();
+                        return;
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(telefonoIngresado) && !telBD.Equals(telefonoIngresado, StringComparison.OrdinalIgnoreCase))
+                    {
+                        MessageBox.Show($"El cliente posee guardado el teléfono '{telBD}'. El valor ingresado en el campo 'Teléfono' es diferente.", "Incoherencia de datos", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        txtTelefono.Focus();
+                        return;
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(emailIngresado) && !emailBD.Equals(emailIngresado, StringComparison.OrdinalIgnoreCase))
+                    {
+                        MessageBox.Show($"El cliente posee guardado el email '{emailBD}'. El valor ingresado en el campo 'Email' es diferente.", "Incoherencia de datos", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        txtEmail.Focus();
+                        return;
+                    }
                 }
                 else
                 {
-                    MessageBox.Show("No se encontró ningún cliente registrado con esos datos.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show($"No se encontró ningún cliente registrado con el DNI '{dniIngresado}'.", "Cliente no encontrado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    txtDni.Focus();
                     return;
                 }
             }
 
+            clienteSeleccionadoId = idClienteEncontrado;
+
+            // 3. Validar existencia y asociación de la mascota con dicho cliente
             int idMascotaAEliminar = -1;
             string queryValidarMascota = "SELECT IdMascota FROM Mascota WHERE IdCliente = @idCliente AND Nombre = @nombreMascota";
             using (var cmdValidar = new SqlCommand(queryValidarMascota, conn))
@@ -544,17 +662,19 @@ namespace PataFacil.Formularios.Recepcionista
                 if (resMascota == null || resMascota == DBNull.Value)
                 {
                     MessageBox.Show(
-                        $"La mascota '{nombreMascota}' no corresponde al cliente '{nombreCliente} {apellidoCliente}'. Por favor verifique los datos.",
+                        $"La mascota '{nombreMascota}' no corresponde al cliente '{nombreCliente} {apellidoCliente}' (DNI: {dniIngresado}). Por favor verifique los datos.",
                         "Incoherencia de datos",
                         MessageBoxButtons.OK,
                         MessageBoxIcon.Error);
+                    txtNombreMascota.Focus();
                     return;
                 }
 
                 idMascotaAEliminar = Convert.ToInt32(resMascota);
             }
 
-            DialogResult dr = MessageBox.Show(
+            // 4. Diálogo de confirmación (Mascota individual vs Cliente completo)
+            DialogResult drDialogo = MessageBox.Show(
                 $"¿Desea dar de baja únicamente a la mascota '{nombreMascota}'?\n\n" +
                 $"• [Sí] -> Elimina SOLO a la mascota '{nombreMascota}' (conserva al cliente).\n" +
                 $"• [No] -> Elimina al cliente '{nombreCliente} {apellidoCliente}' y TODAS sus mascotas.\n" +
@@ -563,13 +683,13 @@ namespace PataFacil.Formularios.Recepcionista
                 MessageBoxButtons.YesNoCancel,
                 MessageBoxIcon.Question);
 
-            if (dr == DialogResult.Cancel)
+            if (drDialogo == DialogResult.Cancel)
                 return;
 
             using SqlTransaction transaction = conn.BeginTransaction();
             try
             {
-                if (dr == DialogResult.Yes)
+                if (drDialogo == DialogResult.Yes)
                 {
                     using var cmdM = new SqlCommand("DELETE FROM Mascota WHERE IdMascota = @idMascota", conn, transaction);
                     cmdM.Parameters.AddWithValue("@idMascota", idMascotaAEliminar);
@@ -578,7 +698,7 @@ namespace PataFacil.Formularios.Recepcionista
                     transaction.Commit();
                     MessageBox.Show($"La mascota '{nombreMascota}' fue dada de baja correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
-                else if (dr == DialogResult.No)
+                else if (drDialogo == DialogResult.No)
                 {
                     using var cmdM = new SqlCommand("DELETE FROM Mascota WHERE IdCliente = @idCliente", conn, transaction);
                     cmdM.Parameters.AddWithValue("@idCliente", clienteSeleccionadoId);
