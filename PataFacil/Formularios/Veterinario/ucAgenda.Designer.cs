@@ -17,181 +17,187 @@
 
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-            this.lblFecha = new System.Windows.Forms.Label();
-            this.dtpFecha = new System.Windows.Forms.DateTimePicker();
-            this.btnHoy = new System.Windows.Forms.Button();
-            this.chkSoloPendientes = new System.Windows.Forms.CheckBox();
-            this.dgvAgenda = new System.Windows.Forms.DataGridView();
-            this.btnAbrirHistoria = new System.Windows.Forms.Button();
-            this.colId = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colHora = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colMascota = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colEspecie = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colDueno = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colMotivo = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colTipo = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colEstado = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            ((System.ComponentModel.ISupportInitialize)(this.dgvAgenda)).BeginInit();
-            this.SuspendLayout();
-            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(228)))), ((int)(((byte)(224)))), ((int)(((byte)(218)))));
-            dataGridViewCellStyle1.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            dataGridViewCellStyle1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(34)))), ((int)(((byte)(34)))), ((int)(((byte)(34)))));
-            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(228)))), ((int)(((byte)(224)))), ((int)(((byte)(218)))));
-            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(34)))), ((int)(((byte)(34)))), ((int)(((byte)(34)))));
-            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
+            lblFecha = new Label();
+            dtpFecha = new DateTimePicker();
+            btnHoy = new Button();
+            chkSoloPendientes = new CheckBox();
+            dgvAgenda = new DataGridView();
+            colId = new DataGridViewTextBoxColumn();
+            colHora = new DataGridViewTextBoxColumn();
+            colMascota = new DataGridViewTextBoxColumn();
+            colEspecie = new DataGridViewTextBoxColumn();
+            colDueno = new DataGridViewTextBoxColumn();
+            colMotivo = new DataGridViewTextBoxColumn();
+            colTipo = new DataGridViewTextBoxColumn();
+            colEstado = new DataGridViewTextBoxColumn();
+            btnAbrirHistoria = new Button();
+            ((System.ComponentModel.ISupportInitialize)dgvAgenda).BeginInit();
+            SuspendLayout();
             // 
             // lblFecha
             // 
-            this.lblFecha.AutoSize = true;
-            this.lblFecha.Location = new System.Drawing.Point(20, 15);
-            this.lblFecha.Name = "lblFecha";
-            this.lblFecha.Size = new System.Drawing.Size(40, 23);
-            this.lblFecha.TabIndex = 0;
-            this.lblFecha.Text = "Fecha";
+            lblFecha.AutoSize = true;
+            lblFecha.Location = new Point(20, 15);
+            lblFecha.Name = "lblFecha";
+            lblFecha.Size = new Size(54, 23);
+            lblFecha.TabIndex = 0;
+            lblFecha.Text = "Fecha";
             // 
             // dtpFecha
             // 
-            this.dtpFecha.Format = System.Windows.Forms.DateTimePickerFormat.Short;
-            this.dtpFecha.Location = new System.Drawing.Point(20, 40);
-            this.dtpFecha.Name = "dtpFecha";
-            this.dtpFecha.Size = new System.Drawing.Size(160, 29);
-            this.dtpFecha.TabIndex = 1;
+            dtpFecha.Format = DateTimePickerFormat.Short;
+            dtpFecha.Location = new Point(20, 40);
+            dtpFecha.Name = "dtpFecha";
+            dtpFecha.Size = new Size(160, 30);
+            dtpFecha.TabIndex = 1;
+            dtpFecha.ValueChanged += dtpFecha_ValueChanged;
             // 
             // btnHoy
             // 
-            this.btnHoy.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(228)))), ((int)(((byte)(224)))), ((int)(((byte)(218)))));
-            this.btnHoy.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnHoy.FlatAppearance.BorderSize = 0;
-            this.btnHoy.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnHoy.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(34)))), ((int)(((byte)(34)))), ((int)(((byte)(34)))));
-            this.btnHoy.Location = new System.Drawing.Point(195, 38);
-            this.btnHoy.Name = "btnHoy";
-            this.btnHoy.Size = new System.Drawing.Size(100, 32);
-            this.btnHoy.TabIndex = 2;
-            this.btnHoy.Text = "Hoy";
-            this.btnHoy.UseVisualStyleBackColor = false;
+            btnHoy.BackColor = Color.FromArgb(228, 224, 218);
+            btnHoy.Cursor = Cursors.Hand;
+            btnHoy.FlatAppearance.BorderSize = 0;
+            btnHoy.FlatStyle = FlatStyle.Flat;
+            btnHoy.ForeColor = Color.FromArgb(34, 34, 34);
+            btnHoy.Location = new Point(195, 38);
+            btnHoy.Name = "btnHoy";
+            btnHoy.Size = new Size(100, 32);
+            btnHoy.TabIndex = 2;
+            btnHoy.Text = "Hoy";
+            btnHoy.UseVisualStyleBackColor = false;
+            btnHoy.Click += btnHoy_Click;
             // 
             // chkSoloPendientes
             // 
-            this.chkSoloPendientes.AutoSize = true;
-            this.chkSoloPendientes.Location = new System.Drawing.Point(315, 44);
-            this.chkSoloPendientes.Name = "chkSoloPendientes";
-            this.chkSoloPendientes.Size = new System.Drawing.Size(146, 27);
-            this.chkSoloPendientes.TabIndex = 3;
-            this.chkSoloPendientes.Text = "Solo pendientes";
-            this.chkSoloPendientes.UseVisualStyleBackColor = true;
+            chkSoloPendientes.AutoSize = true;
+            chkSoloPendientes.Location = new Point(315, 44);
+            chkSoloPendientes.Name = "chkSoloPendientes";
+            chkSoloPendientes.Size = new Size(154, 27);
+            chkSoloPendientes.TabIndex = 3;
+            chkSoloPendientes.Text = "Solo pendientes";
+            chkSoloPendientes.UseVisualStyleBackColor = true;
+            chkSoloPendientes.CheckedChanged += chkSoloPendientes_CheckedChanged;
             // 
             // dgvAgenda
             // 
-            this.dgvAgenda.AllowUserToAddRows = false;
-            this.dgvAgenda.AllowUserToDeleteRows = false;
-            this.dgvAgenda.AllowUserToResizeRows = false;
-            this.dgvAgenda.Anchor = ((System.Windows.Forms.AnchorStyles)(System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right));
-            this.dgvAgenda.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
-            this.dgvAgenda.BackgroundColor = System.Drawing.Color.White;
-            this.dgvAgenda.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
-            this.dgvAgenda.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dgvAgenda.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.colId,
-            this.colHora,
-            this.colMascota,
-            this.colEspecie,
-            this.colDueno,
-            this.colMotivo,
-            this.colTipo,
-            this.colEstado});
-            this.dgvAgenda.EnableHeadersVisualStyles = false;
-            this.dgvAgenda.Location = new System.Drawing.Point(20, 90);
-            this.dgvAgenda.MultiSelect = false;
-            this.dgvAgenda.Name = "dgvAgenda";
-            this.dgvAgenda.ReadOnly = true;
-            this.dgvAgenda.RowHeadersVisible = false;
-            this.dgvAgenda.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dgvAgenda.Size = new System.Drawing.Size(1060, 300);
-            this.dgvAgenda.TabIndex = 4;
-            // 
-            // btnAbrirHistoria
-            // 
-            this.btnAbrirHistoria.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(31)))), ((int)(((byte)(122)))), ((int)(((byte)(140)))));
-            this.btnAbrirHistoria.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnAbrirHistoria.FlatAppearance.BorderSize = 0;
-            this.btnAbrirHistoria.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnAbrirHistoria.ForeColor = System.Drawing.Color.White;
-            this.btnAbrirHistoria.Location = new System.Drawing.Point(20, 405);
-            this.btnAbrirHistoria.Name = "btnAbrirHistoria";
-            this.btnAbrirHistoria.Size = new System.Drawing.Size(200, 32);
-            this.btnAbrirHistoria.TabIndex = 5;
-            this.btnAbrirHistoria.Text = "Abrir historia cl\u00ednica";
-            this.btnAbrirHistoria.UseVisualStyleBackColor = false;
+            dgvAgenda.AllowUserToAddRows = false;
+            dgvAgenda.AllowUserToDeleteRows = false;
+            dgvAgenda.AllowUserToResizeRows = false;
+            dgvAgenda.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            dgvAgenda.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            dgvAgenda.BackgroundColor = Color.White;
+            dataGridViewCellStyle1.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.BackColor = Color.FromArgb(228, 224, 218);
+            dataGridViewCellStyle1.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
+            dataGridViewCellStyle1.ForeColor = Color.FromArgb(34, 34, 34);
+            dataGridViewCellStyle1.SelectionBackColor = Color.FromArgb(228, 224, 218);
+            dataGridViewCellStyle1.SelectionForeColor = Color.FromArgb(34, 34, 34);
+            dataGridViewCellStyle1.WrapMode = DataGridViewTriState.False;
+            dgvAgenda.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            dgvAgenda.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dgvAgenda.Columns.AddRange(new DataGridViewColumn[] { colId, colHora, colMascota, colEspecie, colDueno, colMotivo, colTipo, colEstado });
+            dgvAgenda.EnableHeadersVisualStyles = false;
+            dgvAgenda.Location = new Point(20, 90);
+            dgvAgenda.MultiSelect = false;
+            dgvAgenda.Name = "dgvAgenda";
+            dgvAgenda.ReadOnly = true;
+            dgvAgenda.RowHeadersVisible = false;
+            dgvAgenda.RowHeadersWidth = 51;
+            dgvAgenda.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dgvAgenda.Size = new Size(1060, 300);
+            dgvAgenda.TabIndex = 4;
             // 
             // colId
             // 
-            this.colId.HeaderText = "Id (oculta)";
-            this.colId.Name = "colId";
-            this.colId.ReadOnly = true;
-            this.colId.Visible = false;
+            colId.HeaderText = "Id (oculta)";
+            colId.MinimumWidth = 6;
+            colId.Name = "colId";
+            colId.ReadOnly = true;
+            colId.Visible = false;
             // 
             // colHora
             // 
-            this.colHora.HeaderText = "Hora";
-            this.colHora.Name = "colHora";
-            this.colHora.ReadOnly = true;
+            colHora.HeaderText = "Hora";
+            colHora.MinimumWidth = 6;
+            colHora.Name = "colHora";
+            colHora.ReadOnly = true;
             // 
             // colMascota
             // 
-            this.colMascota.HeaderText = "Mascota";
-            this.colMascota.Name = "colMascota";
-            this.colMascota.ReadOnly = true;
+            colMascota.HeaderText = "Mascota";
+            colMascota.MinimumWidth = 6;
+            colMascota.Name = "colMascota";
+            colMascota.ReadOnly = true;
             // 
             // colEspecie
             // 
-            this.colEspecie.HeaderText = "Especie";
-            this.colEspecie.Name = "colEspecie";
-            this.colEspecie.ReadOnly = true;
+            colEspecie.HeaderText = "Especie";
+            colEspecie.MinimumWidth = 6;
+            colEspecie.Name = "colEspecie";
+            colEspecie.ReadOnly = true;
             // 
             // colDueno
             // 
-            this.colDueno.HeaderText = "Due\u00f1o";
-            this.colDueno.Name = "colDueno";
-            this.colDueno.ReadOnly = true;
+            colDueno.HeaderText = "Dueño";
+            colDueno.MinimumWidth = 6;
+            colDueno.Name = "colDueno";
+            colDueno.ReadOnly = true;
             // 
             // colMotivo
             // 
-            this.colMotivo.HeaderText = "Motivo";
-            this.colMotivo.Name = "colMotivo";
-            this.colMotivo.ReadOnly = true;
+            colMotivo.HeaderText = "Motivo";
+            colMotivo.MinimumWidth = 6;
+            colMotivo.Name = "colMotivo";
+            colMotivo.ReadOnly = true;
             // 
             // colTipo
             // 
-            this.colTipo.HeaderText = "Tipo";
-            this.colTipo.Name = "colTipo";
-            this.colTipo.ReadOnly = true;
+            colTipo.HeaderText = "Tipo";
+            colTipo.MinimumWidth = 6;
+            colTipo.Name = "colTipo";
+            colTipo.ReadOnly = true;
             // 
             // colEstado
             // 
-            this.colEstado.HeaderText = "Estado";
-            this.colEstado.Name = "colEstado";
-            this.colEstado.ReadOnly = true;
+            colEstado.HeaderText = "Estado";
+            colEstado.MinimumWidth = 6;
+            colEstado.Name = "colEstado";
+            colEstado.ReadOnly = true;
+            // 
+            // btnAbrirHistoria
+            // 
+            btnAbrirHistoria.BackColor = Color.FromArgb(31, 122, 140);
+            btnAbrirHistoria.Cursor = Cursors.Hand;
+            btnAbrirHistoria.FlatAppearance.BorderSize = 0;
+            btnAbrirHistoria.FlatStyle = FlatStyle.Flat;
+            btnAbrirHistoria.ForeColor = Color.White;
+            btnAbrirHistoria.Location = new Point(20, 405);
+            btnAbrirHistoria.Name = "btnAbrirHistoria";
+            btnAbrirHistoria.Size = new Size(200, 32);
+            btnAbrirHistoria.TabIndex = 5;
+            btnAbrirHistoria.Text = "Abrir historia clínica";
+            btnAbrirHistoria.UseVisualStyleBackColor = false;
+            btnAbrirHistoria.Click += btnAbrirHistoria_Click;
             // 
             // ucAgenda
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
-            this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(241)))), ((int)(((byte)(236)))));
-            this.Controls.Add(this.lblFecha);
-            this.Controls.Add(this.dtpFecha);
-            this.Controls.Add(this.btnHoy);
-            this.Controls.Add(this.chkSoloPendientes);
-            this.Controls.Add(this.dgvAgenda);
-            this.Controls.Add(this.btnAbrirHistoria);
-            this.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.Name = "ucAgenda";
-            this.Size = new System.Drawing.Size(1100, 560);
-            ((System.ComponentModel.ISupportInitialize)(this.dgvAgenda)).EndInit();
-            this.ResumeLayout(false);
-            this.PerformLayout();
+            AutoScaleDimensions = new SizeF(120F, 120F);
+            AutoScaleMode = AutoScaleMode.Dpi;
+            BackColor = Color.FromArgb(244, 241, 236);
+            Controls.Add(lblFecha);
+            Controls.Add(dtpFecha);
+            Controls.Add(btnHoy);
+            Controls.Add(chkSoloPendientes);
+            Controls.Add(dgvAgenda);
+            Controls.Add(btnAbrirHistoria);
+            Font = new Font("Segoe UI", 10F);
+            Name = "ucAgenda";
+            Size = new Size(1100, 560);
+            Load += ucAgenda_Load;
+            ((System.ComponentModel.ISupportInitialize)dgvAgenda).EndInit();
+            ResumeLayout(false);
+            PerformLayout();
 
         }
 
