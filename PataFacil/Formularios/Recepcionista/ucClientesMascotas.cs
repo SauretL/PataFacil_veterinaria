@@ -28,13 +28,30 @@ namespace PataFacil.Formularios.Recepcionista
             btnBajaCliente.Click -= btnDarBajaCliente_Click;
             btnBajaCliente.Click += btnDarBajaCliente_Click;
 
+            // Enlace de eventos para impedir el resaltado azul
+            dgvClientes.SelectionChanged += DesactivarSeleccionClientes;
+            dgvMascotas.SelectionChanged += DesactivarSeleccionMascotas;
+
             ConfigurarMapeoColumnas();
             InicializarCombos();
             CargarClientes();
         }
 
+        private void DesactivarSeleccionClientes(object sender, EventArgs e)
+        {
+            dgvClientes.ClearSelection();
+        }
+
+        private void DesactivarSeleccionMascotas(object sender, EventArgs e)
+        {
+            dgvMascotas.ClearSelection();
+        }
+
         private void ConfigurarMapeoColumnas()
         {
+            dgvClientes.ReadOnly = true;
+            dgvMascotas.ReadOnly = true;
+
             dgvClientes.AutoGenerateColumns = false;
             dgvMascotas.AutoGenerateColumns = false;
 
@@ -118,18 +135,6 @@ namespace PataFacil.Formularios.Recepcionista
                         }
                     }
 
-                    dgvClientes.ClearSelection();
-                    dgvClientes.Rows[indexFila].Selected = true;
-
-                    for (int c = 0; c < dgvClientes.Columns.Count; c++)
-                    {
-                        if (dgvClientes.Columns[c].Visible)
-                        {
-                            dgvClientes.CurrentCell = dgvClientes.Rows[indexFila].Cells[c];
-                            break;
-                        }
-                    }
-
                     if (dgvClientes.Rows[indexFila].DataBoundItem is DataRowView drv)
                     {
                         clienteSeleccionadoId = Convert.ToInt32(drv["ID"]);
@@ -144,7 +149,6 @@ namespace PataFacil.Formularios.Recepcionista
                 }
                 else
                 {
-                    dgvClientes.ClearSelection();
                     if (!string.IsNullOrWhiteSpace(filtro))
                     {
                         CargarMascotasPorFiltroCliente(filtro);
@@ -159,6 +163,8 @@ namespace PataFacil.Formularios.Recepcionista
             {
                 LimpiarCampos(limpiarGrillaMascotas: true);
             }
+
+            dgvClientes.ClearSelection();
         }
 
         private void CargarTodasLasMascotas()
@@ -199,6 +205,8 @@ namespace PataFacil.Formularios.Recepcionista
 
             if (dgvMascotas.Columns["ID"] != null)
                 dgvMascotas.Columns["ID"].Visible = false;
+
+            dgvMascotas.ClearSelection();
         }
 
         private void CargarMascotasPorFiltroCliente(string filtro)
@@ -222,6 +230,8 @@ namespace PataFacil.Formularios.Recepcionista
 
             if (dgvMascotas.Columns["ID"] != null)
                 dgvMascotas.Columns["ID"].Visible = false;
+
+            dgvMascotas.ClearSelection();
         }
 
         private void btnBuscar_Click(object sender, EventArgs e)
@@ -250,6 +260,8 @@ namespace PataFacil.Formularios.Recepcionista
                     CargarMascotasDelCliente(clienteSeleccionadoId);
                 }
             }
+
+            dgvClientes.ClearSelection();
         }
 
         private void dgvMascotas_CellClick(object sender, DataGridViewCellEventArgs e)
@@ -270,10 +282,12 @@ namespace PataFacil.Formularios.Recepcionista
                         dtpNacimiento.Value = Convert.ToDateTime(drv["Nacimiento"]);
                 }
             }
+
+            dgvMascotas.ClearSelection();
         }
 
         // ==========================================
-        // BOTONES DE ACCIÓN
+        // BOTÓN REGISTRAR
         // ==========================================
         private void btnRegistrar_Click(object sender, EventArgs e)
         {
@@ -291,25 +305,70 @@ namespace PataFacil.Formularios.Recepcionista
 
             try
             {
-                string queryCliente = @"INSERT INTO Cliente (Nombre, Apellido, DNI, Telefono, Email) 
-                                        VALUES (@nombre, @apellido, @dni, @telefono, @email); 
-                                        SELECT SCOPE_IDENTITY();";
+                string dniIngresado = txtDni.Text.Trim();
+                string nombreMascota = txtNombreMascota.Text.Trim();
+                int idClienteDestino = -1;
 
-                using var cmdCliente = new SqlCommand(queryCliente, conn, transaction);
-                cmdCliente.Parameters.AddWithValue("@nombre", txtNombre.Text.Trim());
-                cmdCliente.Parameters.AddWithValue("@apellido", txtApellido.Text.Trim());
-                cmdCliente.Parameters.AddWithValue("@dni", txtDni.Text.Trim());
-                cmdCliente.Parameters.AddWithValue("@telefono", txtTelefono.Text.Trim());
-                cmdCliente.Parameters.AddWithValue("@email", string.IsNullOrWhiteSpace(txtEmail.Text) ? DBNull.Value : txtEmail.Text.Trim());
+                string queryBuscarCliente = "SELECT IdCliente FROM Cliente WHERE DNI = @dni";
+                using (var cmdBuscar = new SqlCommand(queryBuscarCliente, conn, transaction))
+                {
+                    cmdBuscar.Parameters.AddWithValue("@dni", dniIngresado);
+                    object res = cmdBuscar.ExecuteScalar();
+                    if (res != null && res != DBNull.Value)
+                    {
+                        idClienteDestino = Convert.ToInt32(res);
+                    }
+                }
 
-                int idNuevoCliente = Convert.ToInt32(cmdCliente.ExecuteScalar());
+                if (idClienteDestino != -1)
+                {
+                    string queryUpdateCliente = @"UPDATE Cliente 
+                                                  SET Nombre = @nombre, Apellido = @apellido, Telefono = @telefono, Email = @email 
+                                                  WHERE IdCliente = @id";
+                    using var cmdUpdate = new SqlCommand(queryUpdateCliente, conn, transaction);
+                    cmdUpdate.Parameters.AddWithValue("@id", idClienteDestino);
+                    cmdUpdate.Parameters.AddWithValue("@nombre", txtNombre.Text.Trim());
+                    cmdUpdate.Parameters.AddWithValue("@apellido", txtApellido.Text.Trim());
+                    cmdUpdate.Parameters.AddWithValue("@telefono", txtTelefono.Text.Trim());
+                    cmdUpdate.Parameters.AddWithValue("@email", string.IsNullOrWhiteSpace(txtEmail.Text) ? DBNull.Value : txtEmail.Text.Trim());
+                    cmdUpdate.ExecuteNonQuery();
+                }
+                else
+                {
+                    string queryInsertCliente = @"INSERT INTO Cliente (Nombre, Apellido, DNI, Telefono, Email) 
+                                                  VALUES (@nombre, @apellido, @dni, @telefono, @email); 
+                                                  SELECT SCOPE_IDENTITY();";
+                    using var cmdInsert = new SqlCommand(queryInsertCliente, conn, transaction);
+                    cmdInsert.Parameters.AddWithValue("@nombre", txtNombre.Text.Trim());
+                    cmdInsert.Parameters.AddWithValue("@apellido", txtApellido.Text.Trim());
+                    cmdInsert.Parameters.AddWithValue("@dni", dniIngresado);
+                    cmdInsert.Parameters.AddWithValue("@telefono", txtTelefono.Text.Trim());
+                    cmdInsert.Parameters.AddWithValue("@email", string.IsNullOrWhiteSpace(txtEmail.Text) ? DBNull.Value : txtEmail.Text.Trim());
 
-                string queryMascota = @"INSERT INTO Mascota (IdCliente, Nombre, Especie, Raza, Sexo, FechaNacimiento) 
-                                        VALUES (@idCliente, @nombreMascota, @especie, @raza, @sexo, @nacimiento)";
+                    idClienteDestino = Convert.ToInt32(cmdInsert.ExecuteScalar());
+                }
 
-                using var cmdMascota = new SqlCommand(queryMascota, conn, transaction);
-                cmdMascota.Parameters.AddWithValue("@idCliente", idNuevoCliente);
-                cmdMascota.Parameters.AddWithValue("@nombreMascota", txtNombreMascota.Text.Trim());
+                string queryExisteMascota = "SELECT COUNT(*) FROM Mascota WHERE IdCliente = @idCliente AND Nombre = @nombreMascota";
+                using (var cmdValidarMascota = new SqlCommand(queryExisteMascota, conn, transaction))
+                {
+                    cmdValidarMascota.Parameters.AddWithValue("@idCliente", idClienteDestino);
+                    cmdValidarMascota.Parameters.AddWithValue("@nombreMascota", nombreMascota);
+
+                    int existe = Convert.ToInt32(cmdValidarMascota.ExecuteScalar());
+                    if (existe > 0)
+                    {
+                        transaction.Rollback();
+                        MessageBox.Show($"El cliente ya posee registrada una mascota con el nombre '{nombreMascota}'.", "Mascota existente", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return;
+                    }
+                }
+
+                string queryInsertMascota = @"INSERT INTO Mascota (IdCliente, Nombre, Especie, Raza, Sexo, FechaNacimiento) 
+                                              VALUES (@idCliente, @nombreMascota, @especie, @raza, @sexo, @nacimiento)";
+
+                using var cmdMascota = new SqlCommand(queryInsertMascota, conn, transaction);
+                cmdMascota.Parameters.AddWithValue("@idCliente", idClienteDestino);
+                cmdMascota.Parameters.AddWithValue("@nombreMascota", nombreMascota);
                 cmdMascota.Parameters.AddWithValue("@especie", cmbEspecie.SelectedItem?.ToString() ?? string.Empty);
                 cmdMascota.Parameters.AddWithValue("@raza", string.IsNullOrWhiteSpace(txtRaza.Text) ? DBNull.Value : txtRaza.Text.Trim());
                 cmdMascota.Parameters.AddWithValue("@sexo", cmbSexo.SelectedItem?.ToString() ?? string.Empty);
@@ -318,10 +377,10 @@ namespace PataFacil.Formularios.Recepcionista
                 cmdMascota.ExecuteNonQuery();
 
                 transaction.Commit();
-                MessageBox.Show("Cliente y mascota registrados correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("Mascota registrada con éxito.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
                 LimpiarCampos(limpiarGrillaMascotas: false);
-                CargarClientes(idClienteASeleccionar: idNuevoCliente);
+                CargarClientes();
             }
             catch (Exception ex)
             {
@@ -370,7 +429,7 @@ namespace PataFacil.Formularios.Recepcionista
                 transaction.Commit();
                 MessageBox.Show("Datos actualizados con éxito.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-                CargarClientes(idClienteASeleccionar: clienteSeleccionadoId);
+                CargarClientes();
             }
             catch (Exception ex)
             {
@@ -380,7 +439,7 @@ namespace PataFacil.Formularios.Recepcionista
         }
 
         // ==========================================
-        // DAR DE BAJA CLIENTE Y MASCOTA CON VALIDACIÓN DE CONEXIÓN
+        // DAR DE BAJA (PERMITE ELEGIR SI BORRAR SOLO LA MASCOTA O TAMBIÉN AL CLIENTE)
         // ==========================================
         private void btnDarBajaCliente_Click(object sender, EventArgs e)
         {
@@ -388,7 +447,6 @@ namespace PataFacil.Formularios.Recepcionista
             string apellidoCliente = txtApellido.Text.Trim();
             string nombreMascota = txtNombreMascota.Text.Trim();
 
-            // 1. Validación de campos requeridos
             if (string.IsNullOrWhiteSpace(nombreCliente) ||
                 string.IsNullOrWhiteSpace(apellidoCliente) ||
                 string.IsNullOrWhiteSpace(nombreMascota))
@@ -404,7 +462,7 @@ namespace PataFacil.Formularios.Recepcionista
             using var conn = new SqlConnection(connectionString);
             conn.Open();
 
-            // 2. Si no proviene de una selección previa de grilla, se busca el ID por Nombre y Apellido
+            // Buscar ID del cliente si no viene de una selección activa
             if (clienteSeleccionadoId == -1)
             {
                 string queryBuscarId = "SELECT TOP 1 IdCliente FROM Cliente WHERE Nombre = @nom AND Apellido = @ape";
@@ -424,15 +482,16 @@ namespace PataFacil.Formularios.Recepcionista
                 }
             }
 
-            // 3. VALIDACIÓN DE RELACIÓN REAL: Comprueba que la mascota pertenezca al cliente especificado
-            string queryValidarMascota = "SELECT COUNT(*) FROM Mascota WHERE IdCliente = @idCliente AND Nombre = @nombreMascota";
+            // Validar la relación entre el cliente y la mascota
+            int idMascotaAEliminar = -1;
+            string queryValidarMascota = "SELECT IdMascota FROM Mascota WHERE IdCliente = @idCliente AND Nombre = @nombreMascota";
             using (var cmdValidar = new SqlCommand(queryValidarMascota, conn))
             {
                 cmdValidar.Parameters.AddWithValue("@idCliente", clienteSeleccionadoId);
                 cmdValidar.Parameters.AddWithValue("@nombreMascota", nombreMascota);
 
-                int count = Convert.ToInt32(cmdValidar.ExecuteScalar());
-                if (count == 0)
+                object resMascota = cmdValidar.ExecuteScalar();
+                if (resMascota == null || resMascota == DBNull.Value)
                 {
                     MessageBox.Show(
                         $"La mascota '{nombreMascota}' no corresponde al cliente '{nombreCliente} {apellidoCliente}'. Por favor verifique los datos.",
@@ -441,41 +500,58 @@ namespace PataFacil.Formularios.Recepcionista
                         MessageBoxIcon.Error);
                     return;
                 }
+
+                idMascotaAEliminar = Convert.ToInt32(resMascota);
             }
 
-            // 4. Si la relación es válida, solicita confirmación y ejecuta la eliminación
+            // Preguntar al usuario el alcance de la baja (Solo mascota vs Cliente completo)
             DialogResult dr = MessageBox.Show(
-                $"¿Está seguro de dar de baja al cliente '{nombreCliente} {apellidoCliente}' y a su mascota '{nombreMascota}'?",
-                "Confirmar baja unificada",
-                MessageBoxButtons.YesNo,
+                $"¿Desea dar de baja únicamente a la mascota '{nombreMascota}'?\n\n" +
+                $"• [Sí] -> Elimina SOLO a la mascota '{nombreMascota}' (conserva al cliente).\n" +
+                $"• [No] -> Elimina al cliente '{nombreCliente} {apellidoCliente}' y TODAS sus mascotas.\n" +
+                $"• [Cancelar] -> No realiza ningún cambio.",
+                "Seleccionar opción de baja",
+                MessageBoxButtons.YesNoCancel,
                 MessageBoxIcon.Question);
 
-            if (dr == DialogResult.Yes)
+            if (dr == DialogResult.Cancel)
+                return;
+
+            using SqlTransaction transaction = conn.BeginTransaction();
+            try
             {
-                using SqlTransaction transaction = conn.BeginTransaction();
-                try
+                if (dr == DialogResult.Yes)
                 {
-                    // Eliminar mascotas asociadas
-                    using var cmdM = new SqlCommand("DELETE FROM Mascota WHERE IdCliente = @id", conn, transaction);
-                    cmdM.Parameters.AddWithValue("@id", clienteSeleccionadoId);
+                    // OPCIÓN 1: Borrar ÚNICAMENTE la mascota seleccionada
+                    using var cmdM = new SqlCommand("DELETE FROM Mascota WHERE IdMascota = @idMascota", conn, transaction);
+                    cmdM.Parameters.AddWithValue("@idMascota", idMascotaAEliminar);
                     cmdM.ExecuteNonQuery();
 
-                    // Eliminar cliente
-                    using var cmdC = new SqlCommand("DELETE FROM Cliente WHERE IdCliente = @id", conn, transaction);
-                    cmdC.Parameters.AddWithValue("@id", clienteSeleccionadoId);
+                    transaction.Commit();
+                    MessageBox.Show($"La mascota '{nombreMascota}' fue dada de baja correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                else if (dr == DialogResult.No)
+                {
+                    // OPCIÓN 2: Borrar al cliente y a todas sus mascotas
+                    using var cmdM = new SqlCommand("DELETE FROM Mascota WHERE IdCliente = @idCliente", conn, transaction);
+                    cmdM.Parameters.AddWithValue("@idCliente", clienteSeleccionadoId);
+                    cmdM.ExecuteNonQuery();
+
+                    using var cmdC = new SqlCommand("DELETE FROM Cliente WHERE IdCliente = @idCliente", conn, transaction);
+                    cmdC.Parameters.AddWithValue("@idCliente", clienteSeleccionadoId);
                     cmdC.ExecuteNonQuery();
 
                     transaction.Commit();
-                    MessageBox.Show($"El cliente {nombreCliente} {apellidoCliente} y sus mascotas fueron dados de baja correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show($"El cliente '{nombreCliente} {apellidoCliente}' y sus mascotas fueron eliminados.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
 
-                    LimpiarCampos(limpiarGrillaMascotas: false);
-                    CargarClientes();
-                }
-                catch (Exception ex)
-                {
-                    transaction.Rollback();
-                    MessageBox.Show("Error al dar de baja: " + ex.Message, "Error BD", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
+                LimpiarCampos(limpiarGrillaMascotas: false);
+                CargarClientes();
+            }
+            catch (Exception ex)
+            {
+                transaction.Rollback();
+                MessageBox.Show("Error al ejecutar la baja: " + ex.Message, "Error BD", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -506,6 +582,9 @@ namespace PataFacil.Formularios.Recepcionista
             {
                 dgvMascotas.DataSource = null;
             }
+
+            dgvClientes.ClearSelection();
+            dgvMascotas.ClearSelection();
         }
     }
 }
