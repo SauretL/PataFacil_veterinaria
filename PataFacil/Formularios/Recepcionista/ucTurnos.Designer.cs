@@ -28,8 +28,9 @@
         /// </summary>
         private void InitializeComponent()
         {
-            DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
             grpTurnos = new GroupBox();
+            btnConsultarTurnos = new Button();
             txtMotivo = new TextBox();
             lblMotivo = new Label();
             cmbVeterinario = new ComboBox();
@@ -44,12 +45,8 @@
             btnCancelarTurno = new Button();
             btnReprogramar = new Button();
             btnRegistrarTurno = new Button();
-            lblFiltroFecha = new Label();
-            dtpFiltroFecha = new DateTimePicker();
-            lblFiltroVet = new Label();
-            this.cmbFiltroVet = new ComboBox();
             dgvTurnos = new DataGridView();
-            colId = new DataGridViewTextBoxColumn();
+            Fecha = new DataGridViewTextBoxColumn();
             colHora = new DataGridViewTextBoxColumn();
             colMascota = new DataGridViewTextBoxColumn();
             colDueno = new DataGridViewTextBoxColumn();
@@ -63,6 +60,7 @@
             // 
             // grpTurnos
             // 
+            grpTurnos.Controls.Add(btnConsultarTurnos);
             grpTurnos.Controls.Add(txtMotivo);
             grpTurnos.Controls.Add(lblMotivo);
             grpTurnos.Controls.Add(cmbVeterinario);
@@ -80,6 +78,20 @@
             grpTurnos.TabIndex = 0;
             grpTurnos.TabStop = false;
             grpTurnos.Text = "Datos del turno";
+            // 
+            // btnConsultarTurnos
+            // 
+            btnConsultarTurnos.BackColor = Color.FromArgb(228, 224, 218);
+            btnConsultarTurnos.Cursor = Cursors.Hand;
+            btnConsultarTurnos.FlatAppearance.BorderSize = 0;
+            btnConsultarTurnos.FlatStyle = FlatStyle.Flat;
+            btnConsultarTurnos.ForeColor = Color.FromArgb(34, 34, 34);
+            btnConsultarTurnos.Location = new Point(215, 28);
+            btnConsultarTurnos.Name = "btnConsultarTurnos";
+            btnConsultarTurnos.Size = new Size(140, 36);
+            btnConsultarTurnos.TabIndex = 24;
+            btnConsultarTurnos.Text = "Consultar turnos";
+            btnConsultarTurnos.UseVisualStyleBackColor = false;
             // 
             // txtMotivo
             // 
@@ -226,41 +238,6 @@
             btnRegistrarTurno.Text = "Registrar Turno";
             btnRegistrarTurno.UseVisualStyleBackColor = false;
             // 
-            // lblFiltroFecha
-            // 
-            lblFiltroFecha.AutoSize = true;
-            lblFiltroFecha.Location = new Point(470, 11);
-            lblFiltroFecha.Name = "lblFiltroFecha";
-            lblFiltroFecha.Size = new Size(117, 19);
-            lblFiltroFecha.TabIndex = 13;
-            lblFiltroFecha.Text = "Ver turnos del día";
-            // 
-            // dtpFiltroFecha
-            // 
-            dtpFiltroFecha.Format = DateTimePickerFormat.Short;
-            dtpFiltroFecha.Location = new Point(470, 39);
-            dtpFiltroFecha.Name = "dtpFiltroFecha";
-            dtpFiltroFecha.Size = new Size(150, 25);
-            dtpFiltroFecha.TabIndex = 14;
-            // 
-            // lblFiltroVet
-            // 
-            lblFiltroVet.AutoSize = true;
-            lblFiltroVet.Location = new Point(640, 11);
-            lblFiltroVet.Name = "lblFiltroVet";
-            lblFiltroVet.Size = new Size(75, 19);
-            lblFiltroVet.TabIndex = 15;
-            lblFiltroVet.Text = "Veterinario";
-            // 
-            // cmbFiltroVet
-            // 
-            this.cmbFiltroVet.DropDownStyle = ComboBoxStyle.DropDownList;
-            this.cmbFiltroVet.FormattingEnabled = true;
-            this.cmbFiltroVet.Location = new Point(640, 39);
-            this.cmbFiltroVet.Name = "cmbFiltroVet";
-            this.cmbFiltroVet.Size = new Size(250, 25);
-            this.cmbFiltroVet.TabIndex = 16;
-            // 
             // dgvTurnos
             // 
             dgvTurnos.AllowUserToAddRows = false;
@@ -268,32 +245,30 @@
             dgvTurnos.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             dgvTurnos.BackgroundColor = Color.FromArgb(244, 241, 236);
             dgvTurnos.ClipboardCopyMode = DataGridViewClipboardCopyMode.EnableWithoutHeaderText;
-            dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle2.BackColor = Color.FromArgb(228, 224, 218);
-            dataGridViewCellStyle2.Font = new Font("Segoe UI", 9F);
-            dataGridViewCellStyle2.ForeColor = SystemColors.WindowText;
-            dataGridViewCellStyle2.SelectionBackColor = SystemColors.Highlight;
-            dataGridViewCellStyle2.SelectionForeColor = SystemColors.HighlightText;
-            dataGridViewCellStyle2.WrapMode = DataGridViewTriState.True;
-            dgvTurnos.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle1.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.BackColor = Color.FromArgb(228, 224, 218);
+            dataGridViewCellStyle1.Font = new Font("Segoe UI", 9F);
+            dataGridViewCellStyle1.ForeColor = SystemColors.WindowText;
+            dataGridViewCellStyle1.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = DataGridViewTriState.True;
+            dgvTurnos.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             dgvTurnos.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dgvTurnos.Columns.AddRange(new DataGridViewColumn[] { colId, colHora, colMascota, colDueno, colVeterinario, colMotivo, colEstado });
+            dgvTurnos.Columns.AddRange(new DataGridViewColumn[] { Fecha, colHora, colMascota, colDueno, colVeterinario, colMotivo, colEstado });
             dgvTurnos.EnableHeadersVisualStyles = false;
-            dgvTurnos.Location = new Point(470, 91);
+            dgvTurnos.Location = new Point(446, 24);
             dgvTurnos.MultiSelect = false;
             dgvTurnos.Name = "dgvTurnos";
             dgvTurnos.ReadOnly = true;
             dgvTurnos.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dgvTurnos.Size = new Size(610, 306);
+            dgvTurnos.Size = new Size(631, 373);
             dgvTurnos.TabIndex = 17;
-            dgvTurnos.CellContentClick += dataGridView1_CellContentClick;
             // 
-            // colId
+            // Fecha
             // 
-            colId.HeaderText = "ID";
-            colId.Name = "colId";
-            colId.ReadOnly = true;
-            colId.Visible = false;
+            Fecha.HeaderText = "Fecha";
+            Fecha.Name = "Fecha";
+            Fecha.ReadOnly = true;
             // 
             // colHora
             // 
@@ -352,10 +327,6 @@
             BackColor = Color.FromArgb(244, 241, 236);
             Controls.Add(btnLimpiar);
             Controls.Add(dgvTurnos);
-            Controls.Add(this.cmbFiltroVet);
-            Controls.Add(lblFiltroVet);
-            Controls.Add(dtpFiltroFecha);
-            Controls.Add(lblFiltroFecha);
             Controls.Add(btnCancelarTurno);
             Controls.Add(btnReprogramar);
             Controls.Add(btnRegistrarTurno);
@@ -367,7 +338,6 @@
             grpTurnos.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)dgvTurnos).EndInit();
             ResumeLayout(false);
-            PerformLayout();
         }
 
         #endregion
@@ -387,20 +357,17 @@
         private ComboBox cmbHora;
         private Label lblHora;
         private TextBox txtMotivo;
-        private Label lblFiltroFecha;
-        private DateTimePicker dtpFiltroFecha;
-        private Label lblFiltroVet;
-        private ComboBox cmbFiltroVet;
         private DataGridView dgvTurnos;
-        private DataGridViewTextBoxColumn colId;
+        private Button btnCancelarTurno;
+        private Button btnReprogramar;
+        private Button btnLimpiar;
+        private Button btnConsultarTurnos;
+        private DataGridViewTextBoxColumn Fecha;
         private DataGridViewTextBoxColumn colHora;
         private DataGridViewTextBoxColumn colMascota;
         private DataGridViewTextBoxColumn colDueno;
         private DataGridViewTextBoxColumn colVeterinario;
         private DataGridViewTextBoxColumn colMotivo;
         private DataGridViewTextBoxColumn colEstado;
-        private Button btnCancelarTurno;
-        private Button btnReprogramar;
-        private Button btnLimpiar;
     }
 }
