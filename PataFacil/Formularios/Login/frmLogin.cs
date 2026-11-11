@@ -1,8 +1,7 @@
 using PataFacil.Datos;
+using PataFacil.Clases;
 namespace PataFacil
-// Hice el codigo bastante basico, si ven algo que tengan que cambiar haganlo tranquilos,
-// aunque creo que funciona bien, abre los formularios correspondientes segun el usuario
-// y muestra un mensaje de error si el usuario o la contraseña son incorrectos.
+
 {
     public partial class frmLogin : Form
     {
@@ -14,9 +13,11 @@ namespace PataFacil
 
         private void btnIngresar_Click(object sender, EventArgs e)
         {
+            // .Text es lo que escribió la persona. Trim() borra espacios al principio y al final.
             string email = txtEmail.Text.Trim();
             string contrasena = txtClave.Text;
 
+            // --- VALIDAR QUE NO ESTÉN VACÍOS ---
             if (email == "")
             {
                 MessageBox.Show("Completá el campo Email.", "Atención",
@@ -32,6 +33,8 @@ namespace PataFacil
                 return;
             }
 
+            // try/catch: si algo falla (por ejemplo, la base no responde), no se cierra el programa
+            // con un error feo: se va al "catch" y se muestra un mensaje.
             try
             {
                 Dal dal = new Dal();
@@ -45,7 +48,11 @@ namespace PataFacil
                     txtClave.Focus();
                     return;
                 }
+                // Llegó hasta acá: los datos son correctos. Se guarda quién entró.
+                Sesion.Email = email;
+                Sesion.Nombre = dal.ObtenerNombre(email);
 
+                // Según el rol, se abre un formulario distinto.
                 switch (rol)
                 {
                     case "Veterinario":
@@ -68,9 +75,26 @@ namespace PataFacil
             }
 
         }
+        // Abre el formulario que recibe, oculta el login, y decide qué hacer cuando ese
+        // formulario se cierre.
         private void AbrirFormulario(Form formulario)
         {
-            formulario.FormClosed += (s, args) => Application.Exit();
+            formulario.FormClosed += (s, args) =>
+            {
+                if (Sesion.Email == "")
+                {
+                    // cerró sesión: vuelve el login
+                    txtEmail.Clear();
+                    txtClave.Clear();
+                    this.Show();
+                    txtEmail.Focus();
+                }
+                else
+                {
+                    // cerró con la X: se termina el programa
+                    Application.Exit();
+                }
+            };
             formulario.Show();
             this.Hide();
         }
