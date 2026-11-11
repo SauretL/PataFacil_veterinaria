@@ -21,5 +21,14 @@ namespace PataFacil
         {
 
         }
+
+        private void btnCerrarSesion_Click(object sender, EventArgs e)
+        {
+            frmLogin login = new frmLogin();
+
+            login.Show();
+
+            this.Hide();
+        }
     }
 }
