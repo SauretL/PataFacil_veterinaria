@@ -28,8 +28,8 @@
         /// </summary>
         private void InitializeComponent()
         {
-            DataGridViewCellStyle dataGridViewCellStyle3 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle4 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
             lblBuscar = new Label();
             txtBuscar = new TextBox();
             btnBuscar = new Button();
@@ -71,7 +71,6 @@
             btnBajaCliente = new Button();
             btnModificar = new Button();
             btnRegistrar = new Button();
-            btnBajaMascota = new Button();
             btnLimpiar = new Button();
             ((System.ComponentModel.ISupportInitialize)dgvClientes).BeginInit();
             ((System.ComponentModel.ISupportInitialize)dgvMascotas).BeginInit();
@@ -117,14 +116,14 @@
             dgvClientes.AllowUserToDeleteRows = false;
             dgvClientes.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             dgvClientes.BackgroundColor = Color.FromArgb(244, 241, 236);
-            dataGridViewCellStyle3.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle3.BackColor = Color.FromArgb(228, 224, 218);
-            dataGridViewCellStyle3.Font = new Font("Segoe UI", 10F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            dataGridViewCellStyle3.ForeColor = SystemColors.WindowText;
-            dataGridViewCellStyle3.SelectionBackColor = SystemColors.Highlight;
-            dataGridViewCellStyle3.SelectionForeColor = SystemColors.HighlightText;
-            dataGridViewCellStyle3.WrapMode = DataGridViewTriState.True;
-            dgvClientes.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewCellStyle1.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.BackColor = Color.FromArgb(228, 224, 218);
+            dataGridViewCellStyle1.Font = new Font("Segoe UI", 10F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            dataGridViewCellStyle1.ForeColor = SystemColors.WindowText;
+            dataGridViewCellStyle1.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = DataGridViewTriState.True;
+            dgvClientes.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             dgvClientes.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dgvClientes.Columns.AddRange(new DataGridViewColumn[] { colId, colApellido, colNombre, colDni, colTelefono });
             dgvClientes.EnableHeadersVisualStyles = false;
@@ -174,14 +173,14 @@
             dgvMascotas.AllowUserToDeleteRows = false;
             dgvMascotas.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             dgvMascotas.BackgroundColor = Color.FromArgb(244, 241, 236);
-            dataGridViewCellStyle4.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle4.BackColor = Color.FromArgb(228, 224, 218);
-            dataGridViewCellStyle4.Font = new Font("Segoe UI", 10F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            dataGridViewCellStyle4.ForeColor = SystemColors.WindowText;
-            dataGridViewCellStyle4.SelectionBackColor = SystemColors.Highlight;
-            dataGridViewCellStyle4.SelectionForeColor = SystemColors.HighlightText;
-            dataGridViewCellStyle4.WrapMode = DataGridViewTriState.True;
-            dgvMascotas.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle4;
+            dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle2.BackColor = Color.FromArgb(228, 224, 218);
+            dataGridViewCellStyle2.Font = new Font("Segoe UI", 10F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            dataGridViewCellStyle2.ForeColor = SystemColors.WindowText;
+            dataGridViewCellStyle2.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle2.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle2.WrapMode = DataGridViewTriState.True;
+            dgvMascotas.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
             dgvMascotas.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dgvMascotas.Columns.AddRange(new DataGridViewColumn[] { colIdMascota, colNombreMascota, colEspecie, colRaza, colSexo, colNacimiento });
             dgvMascotas.EnableHeadersVisualStyles = false;
@@ -445,9 +444,9 @@
             btnBajaCliente.ForeColor = Color.White;
             btnBajaCliente.Location = new Point(364, 478);
             btnBajaCliente.Name = "btnBajaCliente";
-            btnBajaCliente.Size = new Size(150, 32);
+            btnBajaCliente.Size = new Size(215, 32);
             btnBajaCliente.TabIndex = 9;
-            btnBajaCliente.Text = "Dar de baja cliente";
+            btnBajaCliente.Text = "Dar de baja cliente y mascota";
             btnBajaCliente.UseVisualStyleBackColor = false;
             btnBajaCliente.Click += btnDarBajaCliente_Click;
             // 
@@ -481,21 +480,6 @@
             btnRegistrar.UseVisualStyleBackColor = false;
             btnRegistrar.Click += btnRegistrar_Click;
             // 
-            // btnBajaMascota
-            // 
-            btnBajaMascota.BackColor = Color.FromArgb(181, 69, 47);
-            btnBajaMascota.Cursor = Cursors.Hand;
-            btnBajaMascota.FlatAppearance.BorderSize = 0;
-            btnBajaMascota.FlatStyle = FlatStyle.Flat;
-            btnBajaMascota.ForeColor = Color.White;
-            btnBajaMascota.Location = new Point(526, 478);
-            btnBajaMascota.Name = "btnBajaMascota";
-            btnBajaMascota.Size = new Size(150, 32);
-            btnBajaMascota.TabIndex = 10;
-            btnBajaMascota.Text = "Dar de baja mascota";
-            btnBajaMascota.UseVisualStyleBackColor = false;
-            btnBajaMascota.Click += btnDarBajaMascota_Click;
-            // 
             // btnLimpiar
             // 
             btnLimpiar.BackColor = Color.FromArgb(228, 224, 218);
@@ -503,7 +487,7 @@
             btnLimpiar.FlatAppearance.BorderSize = 0;
             btnLimpiar.FlatStyle = FlatStyle.Flat;
             btnLimpiar.ForeColor = Color.FromArgb(34, 34, 34);
-            btnLimpiar.Location = new Point(688, 478);
+            btnLimpiar.Location = new Point(625, 478);
             btnLimpiar.Name = "btnLimpiar";
             btnLimpiar.Size = new Size(100, 32);
             btnLimpiar.TabIndex = 11;
@@ -517,7 +501,6 @@
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.FromArgb(244, 241, 236);
             Controls.Add(btnLimpiar);
-            Controls.Add(btnBajaMascota);
             Controls.Add(btnBajaCliente);
             Controls.Add(btnModificar);
             Controls.Add(btnRegistrar);
@@ -584,7 +567,6 @@
         private Button btnBajaCliente;
         private Button btnModificar;
         private Button btnRegistrar;
-        private Button btnBajaMascota;
         private Button btnLimpiar;
     }
 }
