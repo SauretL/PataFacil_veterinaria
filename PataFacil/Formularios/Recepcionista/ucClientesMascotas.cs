@@ -23,6 +23,11 @@ namespace PataFacil.Formularios.Recepcionista
         public ucClientesMascotas()
         {
             InitializeComponent();
+
+            // Vinculación del evento Click por seguridad
+            btnBajaCliente.Click -= btnDarBajaCliente_Click;
+            btnBajaCliente.Click += btnDarBajaCliente_Click;
+
             ConfigurarMapeoColumnas();
             InicializarCombos();
             CargarClientes();
@@ -97,12 +102,13 @@ namespace PataFacil.Formularios.Recepcionista
             if (dgvClientes.Columns["ID"] != null)
                 dgvClientes.Columns["ID"].Visible = false;
 
+            btnBajaCliente.Enabled = true;
+
             if (dgvClientes.Rows.Count > 0)
             {
-                int indexFila = 0;
-
                 if (idClienteASeleccionar != -1)
                 {
+                    int indexFila = 0;
                     for (int i = 0; i < dgvClientes.Rows.Count; i++)
                     {
                         if (dgvClientes.Rows[i].DataBoundItem is DataRowView drvTemp && Convert.ToInt32(drvTemp["ID"]) == idClienteASeleccionar)
@@ -111,37 +117,41 @@ namespace PataFacil.Formularios.Recepcionista
                             break;
                         }
                     }
-                }
 
-                dgvClientes.ClearSelection();
-                dgvClientes.Rows[indexFila].Selected = true;
+                    dgvClientes.ClearSelection();
+                    dgvClientes.Rows[indexFila].Selected = true;
 
-                for (int c = 0; c < dgvClientes.Columns.Count; c++)
-                {
-                    if (dgvClientes.Columns[c].Visible)
+                    for (int c = 0; c < dgvClientes.Columns.Count; c++)
                     {
-                        dgvClientes.CurrentCell = dgvClientes.Rows[indexFila].Cells[c];
-                        break;
+                        if (dgvClientes.Columns[c].Visible)
+                        {
+                            dgvClientes.CurrentCell = dgvClientes.Rows[indexFila].Cells[c];
+                            break;
+                        }
+                    }
+
+                    if (dgvClientes.Rows[indexFila].DataBoundItem is DataRowView drv)
+                    {
+                        clienteSeleccionadoId = Convert.ToInt32(drv["ID"]);
+                        txtApellido.Text = drv["Apellido"]?.ToString() ?? string.Empty;
+                        txtNombre.Text = drv["Nombre"]?.ToString() ?? string.Empty;
+                        txtDni.Text = drv["DNI"]?.ToString() ?? string.Empty;
+                        txtTelefono.Text = drv["Telefono"]?.ToString() ?? string.Empty;
+                        txtEmail.Text = drv["Email"]?.ToString() ?? string.Empty;
+
+                        CargarMascotasDelCliente(clienteSeleccionadoId);
                     }
                 }
-
-                if (dgvClientes.Rows[indexFila].DataBoundItem is DataRowView drv)
+                else
                 {
-                    clienteSeleccionadoId = Convert.ToInt32(drv["ID"]);
-                    txtApellido.Text = drv["Apellido"]?.ToString() ?? string.Empty;
-                    txtNombre.Text = drv["Nombre"]?.ToString() ?? string.Empty;
-                    txtDni.Text = drv["DNI"]?.ToString() ?? string.Empty;
-                    txtTelefono.Text = drv["Telefono"]?.ToString() ?? string.Empty;
-                    txtEmail.Text = drv["Email"]?.ToString() ?? string.Empty;
-
-                    // Si hay filtro activo de búsqueda, carga las mascotas de TODOS los clientes filtrados
+                    dgvClientes.ClearSelection();
                     if (!string.IsNullOrWhiteSpace(filtro))
                     {
                         CargarMascotasPorFiltroCliente(filtro);
                     }
                     else
                     {
-                        CargarMascotasDelCliente(clienteSeleccionadoId);
+                        CargarTodasLasMascotas();
                     }
                 }
             }
@@ -149,6 +159,26 @@ namespace PataFacil.Formularios.Recepcionista
             {
                 LimpiarCampos(limpiarGrillaMascotas: true);
             }
+        }
+
+        private void CargarTodasLasMascotas()
+        {
+            using var conn = new SqlConnection(connectionString);
+            string query = "SELECT IdMascota AS ID, Nombre AS Nombre, Especie AS Especie, Raza AS Raza, Sexo AS Sexo, FechaNacimiento AS Nacimiento FROM Mascota";
+
+            using var cmd = new SqlCommand(query, conn);
+            using var da = new SqlDataAdapter(cmd);
+            var dt = new DataTable();
+
+            da.Fill(dt);
+
+            dgvMascotas.AutoGenerateColumns = false;
+            dgvMascotas.DataSource = dt;
+
+            if (dgvMascotas.Columns["ID"] != null)
+                dgvMascotas.Columns["ID"].Visible = false;
+
+            dgvMascotas.ClearSelection();
         }
 
         private void CargarMascotasDelCliente(int idCliente)
@@ -171,7 +201,6 @@ namespace PataFacil.Formularios.Recepcionista
                 dgvMascotas.Columns["ID"].Visible = false;
         }
 
-        // Carga todas las mascotas pertenecientes a cualquier cliente que coincida con la búsqueda
         private void CargarMascotasPorFiltroCliente(string filtro)
         {
             using var conn = new SqlConnection(connectionString);
@@ -218,7 +247,6 @@ namespace PataFacil.Formularios.Recepcionista
                     txtTelefono.Text = drv["Telefono"]?.ToString() ?? string.Empty;
                     txtEmail.Text = drv["Email"]?.ToString() ?? string.Empty;
 
-                    // Al hacer clic manual sobre un cliente individual, filtra solo sus mascotas
                     CargarMascotasDelCliente(clienteSeleccionadoId);
                 }
             }
@@ -351,45 +379,102 @@ namespace PataFacil.Formularios.Recepcionista
             }
         }
 
+        // ==========================================
+        // DAR DE BAJA CLIENTE Y MASCOTA CON VALIDACIÓN DE CONEXIÓN
+        // ==========================================
         private void btnDarBajaCliente_Click(object sender, EventArgs e)
         {
-            if (clienteSeleccionadoId == -1)
+            string nombreCliente = txtNombre.Text.Trim();
+            string apellidoCliente = txtApellido.Text.Trim();
+            string nombreMascota = txtNombreMascota.Text.Trim();
+
+            // 1. Validación de campos requeridos
+            if (string.IsNullOrWhiteSpace(nombreCliente) ||
+                string.IsNullOrWhiteSpace(apellidoCliente) ||
+                string.IsNullOrWhiteSpace(nombreMascota))
             {
-                MessageBox.Show("Seleccione un cliente de la lista para dar de baja.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show(
+                    "Para dar de baja debe seleccionar un registro o indicar:\n- Nombre del cliente\n- Apellido del cliente\n- Nombre de la mascota",
+                    "Atención - Datos incompletos",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
                 return;
             }
 
+            using var conn = new SqlConnection(connectionString);
+            conn.Open();
+
+            // 2. Si no proviene de una selección previa de grilla, se busca el ID por Nombre y Apellido
+            if (clienteSeleccionadoId == -1)
+            {
+                string queryBuscarId = "SELECT TOP 1 IdCliente FROM Cliente WHERE Nombre = @nom AND Apellido = @ape";
+                using var cmdBuscar = new SqlCommand(queryBuscarId, conn);
+                cmdBuscar.Parameters.AddWithValue("@nom", nombreCliente);
+                cmdBuscar.Parameters.AddWithValue("@ape", apellidoCliente);
+                object resId = cmdBuscar.ExecuteScalar();
+
+                if (resId != null && resId != DBNull.Value)
+                {
+                    clienteSeleccionadoId = Convert.ToInt32(resId);
+                }
+                else
+                {
+                    MessageBox.Show("No se encontró ningún cliente registrado con esos datos.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+            }
+
+            // 3. VALIDACIÓN DE RELACIÓN REAL: Comprueba que la mascota pertenezca al cliente especificado
+            string queryValidarMascota = "SELECT COUNT(*) FROM Mascota WHERE IdCliente = @idCliente AND Nombre = @nombreMascota";
+            using (var cmdValidar = new SqlCommand(queryValidarMascota, conn))
+            {
+                cmdValidar.Parameters.AddWithValue("@idCliente", clienteSeleccionadoId);
+                cmdValidar.Parameters.AddWithValue("@nombreMascota", nombreMascota);
+
+                int count = Convert.ToInt32(cmdValidar.ExecuteScalar());
+                if (count == 0)
+                {
+                    MessageBox.Show(
+                        $"La mascota '{nombreMascota}' no corresponde al cliente '{nombreCliente} {apellidoCliente}'. Por favor verifique los datos.",
+                        "Incoherencia de datos",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Error);
+                    return;
+                }
+            }
+
+            // 4. Si la relación es válida, solicita confirmación y ejecuta la eliminación
             DialogResult dr = MessageBox.Show(
-                "¿Está seguro de dar de baja al cliente seleccionado y a todas sus mascotas vinculadas?",
+                $"¿Está seguro de dar de baja al cliente '{nombreCliente} {apellidoCliente}' y a su mascota '{nombreMascota}'?",
                 "Confirmar baja unificada",
                 MessageBoxButtons.YesNo,
                 MessageBoxIcon.Question);
 
             if (dr == DialogResult.Yes)
             {
-                using var conn = new SqlConnection(connectionString);
-                conn.Open();
                 using SqlTransaction transaction = conn.BeginTransaction();
                 try
                 {
+                    // Eliminar mascotas asociadas
                     using var cmdM = new SqlCommand("DELETE FROM Mascota WHERE IdCliente = @id", conn, transaction);
                     cmdM.Parameters.AddWithValue("@id", clienteSeleccionadoId);
                     cmdM.ExecuteNonQuery();
 
+                    // Eliminar cliente
                     using var cmdC = new SqlCommand("DELETE FROM Cliente WHERE IdCliente = @id", conn, transaction);
                     cmdC.Parameters.AddWithValue("@id", clienteSeleccionadoId);
                     cmdC.ExecuteNonQuery();
 
                     transaction.Commit();
-                    MessageBox.Show("Cliente y sus mascotas dados de baja correctamente.", "Información", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show($"El cliente {nombreCliente} {apellidoCliente} y sus mascotas fueron dados de baja correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-                    LimpiarCampos(limpiarGrillaMascotas: true);
+                    LimpiarCampos(limpiarGrillaMascotas: false);
                     CargarClientes();
                 }
                 catch (Exception ex)
                 {
                     transaction.Rollback();
-                    MessageBox.Show("Error al dar de baja: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("Error al dar de baja: " + ex.Message, "Error BD", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
         }
@@ -397,11 +482,14 @@ namespace PataFacil.Formularios.Recepcionista
         private void btnLimpiar_Click(object sender, EventArgs e)
         {
             LimpiarCampos(limpiarGrillaMascotas: false);
+            CargarClientes();
         }
 
         private void LimpiarCampos(bool limpiarGrillaMascotas = false)
         {
+            clienteSeleccionadoId = -1;
             mascotaSeleccionadaId = -1;
+
             txtBuscar.Clear();
             txtNombre.Clear();
             txtApellido.Clear();
@@ -416,7 +504,6 @@ namespace PataFacil.Formularios.Recepcionista
 
             if (limpiarGrillaMascotas)
             {
-                clienteSeleccionadoId = -1;
                 dgvMascotas.DataSource = null;
             }
         }
