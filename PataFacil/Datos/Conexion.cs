@@ -12,7 +12,7 @@ namespace PataFacil.Datos
         //Aca va la conexion con la base de datos cuando este lista.
                
             private const string Cadena =
-                @"Server=.\SQLEXPRESS;Database=PataFacil;Trusted_Connection=True;TrustServerCertificate=True;";
+                @"Server=localhost;Database=PataFacil;Integrated Security=True;TrustServerCertificate=True;";
 
             public static SqlConnection ObtenerConexion()
             {
