@@ -7,17 +7,13 @@ using Microsoft.Data.SqlClient;
 
 namespace PataFacil.Datos
 {
-    public class Conexion
+    internal class Conexion
     {
         //Aca va la conexion con la base de datos cuando este lista.
-               
-            private const string Cadena =
+
+        public static string sConnection =
                 @"Server=localhost;Database=PataFacil;Integrated Security=True;TrustServerCertificate=True;";
 
-            public static SqlConnection ObtenerConexion()
-            {
-                return new SqlConnection(Cadena);
-            }
         
     }
 }
