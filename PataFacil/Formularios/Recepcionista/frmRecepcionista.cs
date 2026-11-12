@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static System.Collections.Specialized.BitVector32;
 
 namespace PataFacil
 {
@@ -27,9 +28,21 @@ namespace PataFacil
 
         }
 
+
         private void btnCerrarSesion_Click(object sender, EventArgs e)
         {
-            Application.Exit();
+            DialogResult resultado = MessageBox.Show(
+        "¿Está seguro de que desea cerrar sesión?",
+        "Cerrar Sesión",
+        MessageBoxButtons.YesNo,
+        MessageBoxIcon.Question
+    );
+
+            if (resultado == DialogResult.Yes)
+            {
+                Application.Restart(); 
+                Environment.Exit(0); // esto asegura que la aplicación se cierre completamente
+            }
         }
     }
 }
