@@ -87,11 +87,11 @@
             lblUsuario.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             lblUsuario.AutoSize = true;
             lblUsuario.ForeColor = Color.White;
-            lblUsuario.Location = new Point(775, 20);
+            lblUsuario.Location = new Point(770, 22);
             lblUsuario.Name = "lblUsuario";
-            lblUsuario.Size = new Size(166, 19);
+            lblUsuario.Size = new Size(174, 19);
             lblUsuario.TabIndex = 1;
-            lblUsuario.Text = "Usuario: Nombre Apellido";
+            lblUsuario.Text = "Usuario: Dra. Maria Gomez";
             // 
             // tabPrincipal
             // 
