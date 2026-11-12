@@ -89,9 +89,9 @@
             lblUsuario.ForeColor = Color.White;
             lblUsuario.Location = new Point(770, 22);
             lblUsuario.Name = "lblUsuario";
-            lblUsuario.Size = new Size(174, 19);
+            lblUsuario.Size = new Size(162, 19);
             lblUsuario.TabIndex = 1;
-            lblUsuario.Text = "Usuario: Dra. Maria Gomez";
+            lblUsuario.Text = "Usuario: Laura Recepción";
             // 
             // tabPrincipal
             // 
