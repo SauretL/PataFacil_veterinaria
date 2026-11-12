@@ -44,5 +44,10 @@ namespace PataFacil
         {
 
         }
+
+        private void btnNuevo_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }

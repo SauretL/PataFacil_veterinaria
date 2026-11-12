@@ -17,7 +17,7 @@
 
         private void InitializeComponent()
         {
-            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle3 = new DataGridViewCellStyle();
             pnlCabecera = new Panel();
             btnCerrarSesion = new Button();
             lblUsuario = new Label();
@@ -172,14 +172,14 @@
             dgvProductos.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             dgvProductos.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             dgvProductos.BackgroundColor = Color.White;
-            dataGridViewCellStyle1.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle1.BackColor = Color.FromArgb(228, 224, 218);
-            dataGridViewCellStyle1.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
-            dataGridViewCellStyle1.ForeColor = Color.FromArgb(34, 34, 34);
-            dataGridViewCellStyle1.SelectionBackColor = Color.FromArgb(228, 224, 218);
-            dataGridViewCellStyle1.SelectionForeColor = Color.FromArgb(34, 34, 34);
-            dataGridViewCellStyle1.WrapMode = DataGridViewTriState.False;
-            dgvProductos.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle3.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle3.BackColor = Color.FromArgb(228, 224, 218);
+            dataGridViewCellStyle3.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
+            dataGridViewCellStyle3.ForeColor = Color.FromArgb(34, 34, 34);
+            dataGridViewCellStyle3.SelectionBackColor = Color.FromArgb(228, 224, 218);
+            dataGridViewCellStyle3.SelectionForeColor = Color.FromArgb(34, 34, 34);
+            dataGridViewCellStyle3.WrapMode = DataGridViewTriState.False;
+            dgvProductos.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle3;
             dgvProductos.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dgvProductos.Columns.AddRange(new DataGridViewColumn[] { colId, colProducto, colCategoria, colStockActual, colStockMinimo, colEstado });
             dgvProductos.EnableHeadersVisualStyles = false;
@@ -339,9 +339,9 @@
             btnNuevo.ForeColor = Color.FromArgb(34, 34, 34);
             btnNuevo.Location = new Point(900, 466);
             btnNuevo.Name = "btnNuevo";
-            btnNuevo.Size = new Size(100, 32);
+            btnNuevo.Size = new Size(150, 32);
             btnNuevo.TabIndex = 10;
-            btnNuevo.Text = "Nuevo";
+            btnNuevo.Text = "Producto Nuevo";
             btnNuevo.UseVisualStyleBackColor = false;
             // 
             // btnIngreso
