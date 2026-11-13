@@ -24,6 +24,10 @@ namespace PataFacil
         //   - con dato -> estamos MODIFICANDO ese producto
         private Producto productoSeleccionado = null;
 
+        // ETAPA 4: lista con los movimientos (ingresos y egresos) registrados.
+        // Es de prueba: se pierde al cerrar el programa. Después se guarda en la base.
+        private List<MovimientoStock> listaMovimientos = new List<MovimientoStock>();
+
         public frmAuxiliar()
         {
             InitializeComponent();
@@ -36,6 +40,9 @@ namespace PataFacil
             dgvProductos.CellClick += dgvProductos_CellClick;
             btnNuevo.Click += btnNuevo_Click;                        // ETAPA 3
             btnGuardarProducto.Click += btnGuardarProducto_Click;    // ETAPA 3
+            btnIngreso.Click += btnIngreso_Click;                    // ETAPA 4
+            btnEgreso.Click += btnEgreso_Click;                      // ETAPA 4
+            btnNotificar.Click += btnNotificar_Click;                // ETAPA 4
 
             // Mostramos el nombre de quien inició sesión (lo guardó el login en Sesion)
             lblUsuario.Text = "Usuario: " + Sesion.Nombre;
@@ -108,6 +115,29 @@ namespace PataFacil
                     producto.StockMinimo = editado.StockMinimo;
                 }
             }
+        }
+
+        // ETAPA 4: registra un movimiento: cambia el stock del producto y guarda el movimiento.
+        private void RegistrarMovimiento(MovimientoStock movimiento)
+        {
+            foreach (Producto producto in listaProductos)
+            {
+                if (producto.Id == movimiento.Producto.Id)
+                {
+                    // Un ingreso suma stock y un egreso lo resta
+                    if (movimiento.Tipo == "Ingreso")
+                    {
+                        producto.StockActual = producto.StockActual + movimiento.Cantidad;
+                    }
+                    else
+                    {
+                        producto.StockActual = producto.StockActual - movimiento.Cantidad;
+                    }
+                }
+            }
+
+            // Guardamos el movimiento en la lista de movimientos
+            listaMovimientos.Add(movimiento);
         }
 
         // -----------------------------------------------------------------
@@ -365,6 +395,106 @@ namespace PataFacil
 
             MessageBox.Show("Producto guardado correctamente.", "Listo",
                             MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        // -----------------------------------------------------------------
+        // ETAPA 4: INGRESOS, EGRESOS Y NOTIFICAR REPOSICIÓN
+        // -----------------------------------------------------------------
+
+        private void btnIngreso_Click(object sender, EventArgs e)
+        {
+            AbrirMovimiento("Ingreso");
+        }
+
+        private void btnEgreso_Click(object sender, EventArgs e)
+        {
+            AbrirMovimiento("Egreso");
+        }
+
+        // Abre el formulario de movimiento. Sirve para los dos botones: el tipo llega como texto.
+        private void AbrirMovimiento(string tipo)
+        {
+            // Primero chequeamos que haya un producto elegido en la grilla
+            if (productoSeleccionado == null)
+            {
+                MessageBox.Show("Primero elegí un producto de la grilla.", "Atención",
+                                MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            // No tiene sentido abrir un egreso si no queda nada para sacar
+            if (tipo == "Egreso" && productoSeleccionado.StockActual == 0)
+            {
+                MessageBox.Show("Este producto no tiene stock para sacar.", "Atención",
+                                MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            // Creamos el formulario pasándole el producto y el tipo.
+            // "using" hace que se libere solo cuando termina.
+            using (frmMovimientoStock formulario = new frmMovimientoStock(productoSeleccionado, tipo))
+            {
+                // ShowDialog abre el formulario y el programa espera hasta que se cierre
+                DialogResult resultado = formulario.ShowDialog(this);
+
+                // Si apretó Cancelar (o cerró la ventana), no hacemos nada
+                if (resultado != DialogResult.OK)
+                {
+                    return;
+                }
+
+                // Confirmó: armamos el movimiento con los datos que cargó
+                MovimientoStock movimiento = new MovimientoStock(
+                    productoSeleccionado, tipo, formulario.Cantidad, formulario.Fecha, formulario.Detalle);
+
+                RegistrarMovimiento(movimiento);
+            }
+
+            // Guardamos el producto en una variable porque LimpiarPanelProducto lo pone en null
+            Producto productoModificado = productoSeleccionado;
+
+            // Actualizamos la pantalla (la grilla respeta los filtros puestos)
+            MostrarProductos(FiltrarProductos());
+            ActualizarAlerta();
+            LimpiarPanelProducto();
+
+            // Avisamos cómo quedó el stock
+            string mensaje = tipo + " registrado. Stock actual de " + productoModificado.Nombre + ": " + productoModificado.StockActual;
+            if (productoModificado.EstaBajoMinimo())
+            {
+                mensaje = mensaje + "\n\nAtención: el producto quedó bajo el stock mínimo (" + productoModificado.StockMinimo + ").";
+            }
+            MessageBox.Show(mensaje, "Listo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        // Botón "Notificar reposición": por ahora solo muestra un mensaje con los productos a reponer.
+        private void btnNotificar_Click(object sender, EventArgs e)
+        {
+            string mensaje = "";
+
+            // Recorremos TODOS los productos (no solo los que se ven en la grilla)
+            foreach (Producto producto in listaProductos)
+            {
+                if (producto.EstaBajoMinimo())
+                {
+                    // Cuántas unidades faltan para llegar al mínimo
+                    int faltan = producto.StockMinimo - producto.StockActual;
+
+                    mensaje = mensaje + "- " + producto.Nombre + ": stock " + producto.StockActual
+                              + ", mínimo " + producto.StockMinimo + " (faltan " + faltan + ")\n";
+                }
+            }
+
+            if (mensaje == "")
+            {
+                MessageBox.Show("No hay productos para reponer.", "Reposición",
+                                MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            else
+            {
+                MessageBox.Show("Productos para reponer:\n\n" + mensaje, "Reposición",
+                                MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
         }
 
         // -----------------------------------------------------------------
