@@ -52,12 +52,13 @@
             btnCerrarSesion.FlatAppearance.BorderSize = 0;
             btnCerrarSesion.FlatStyle = FlatStyle.Flat;
             btnCerrarSesion.ForeColor = Color.FromArgb(34, 34, 34);
-            btnCerrarSesion.Location = new Point(944, 12);
+            btnCerrarSesion.Location = new Point(953, 13);
             btnCerrarSesion.Name = "btnCerrarSesion";
             btnCerrarSesion.Size = new Size(120, 32);
             btnCerrarSesion.TabIndex = 2;
             btnCerrarSesion.Text = "Cerrar sesión";
             btnCerrarSesion.UseVisualStyleBackColor = false;
+            btnCerrarSesion.Click += btnCerrarSesion_Click;
             // 
             // lblUsuario
             // 
@@ -66,7 +67,7 @@
             lblUsuario.ForeColor = Color.White;
             lblUsuario.Location = new Point(740, 18);
             lblUsuario.Name = "lblUsuario";
-            lblUsuario.Size = new Size(166, 19);
+            lblUsuario.Size = new Size(207, 23);
             lblUsuario.TabIndex = 1;
             lblUsuario.Text = "Usuario: Nombre Apellido";
             // 
@@ -77,7 +78,7 @@
             lblTitulo.ForeColor = Color.White;
             lblTitulo.Location = new Point(20, 15);
             lblTitulo.Name = "lblTitulo";
-            lblTitulo.Size = new Size(204, 25);
+            lblTitulo.Size = new Size(261, 32);
             lblTitulo.TabIndex = 0;
             lblTitulo.Text = "PataFácil · Veterinario";
             // 
@@ -91,15 +92,16 @@
             tabPrincipal.SelectedIndex = 0;
             tabPrincipal.Size = new Size(1084, 585);
             tabPrincipal.TabIndex = 0;
+            tabPrincipal.SelectedIndexChanged += tabPrincipal_SelectedIndexChanged;
             // 
             // tabAgenda
             // 
             tabAgenda.BackColor = Color.FromArgb(244, 241, 236);
             tabAgenda.Controls.Add(ucAgenda1);
-            tabAgenda.Location = new Point(4, 26);
+            tabAgenda.Location = new Point(4, 32);
             tabAgenda.Name = "tabAgenda";
             tabAgenda.Padding = new Padding(3);
-            tabAgenda.Size = new Size(1076, 555);
+            tabAgenda.Size = new Size(1076, 549);
             tabAgenda.TabIndex = 0;
             tabAgenda.Text = "Agenda";
             // 
@@ -109,18 +111,19 @@
             ucAgenda1.Dock = DockStyle.Fill;
             ucAgenda1.Font = new Font("Segoe UI", 10F);
             ucAgenda1.Location = new Point(3, 3);
+            ucAgenda1.Margin = new Padding(4);
             ucAgenda1.Name = "ucAgenda1";
-            ucAgenda1.Size = new Size(1070, 549);
+            ucAgenda1.Size = new Size(1070, 543);
             ucAgenda1.TabIndex = 0;
             // 
             // tabHistoria
             // 
             tabHistoria.BackColor = Color.FromArgb(244, 241, 236);
             tabHistoria.Controls.Add(ucHistoriaClinica1);
-            tabHistoria.Location = new Point(4, 26);
+            tabHistoria.Location = new Point(4, 32);
             tabHistoria.Name = "tabHistoria";
             tabHistoria.Padding = new Padding(3);
-            tabHistoria.Size = new Size(1076, 555);
+            tabHistoria.Size = new Size(1076, 549);
             tabHistoria.TabIndex = 1;
             tabHistoria.Text = "Historia clínica";
             // 
@@ -130,13 +133,14 @@
             ucHistoriaClinica1.Dock = DockStyle.Fill;
             ucHistoriaClinica1.Font = new Font("Segoe UI", 10F);
             ucHistoriaClinica1.Location = new Point(3, 3);
+            ucHistoriaClinica1.Margin = new Padding(4, 4, 4, 4);
             ucHistoriaClinica1.Name = "ucHistoriaClinica1";
-            ucHistoriaClinica1.Size = new Size(1070, 549);
+            ucHistoriaClinica1.Size = new Size(1070, 543);
             ucHistoriaClinica1.TabIndex = 0;
             // 
             // frmVeterinario
             // 
-            AutoScaleDimensions = new SizeF(96F, 96F);
+            AutoScaleDimensions = new SizeF(120F, 120F);
             AutoScaleMode = AutoScaleMode.Dpi;
             BackColor = Color.FromArgb(244, 241, 236);
             ClientSize = new Size(1084, 641);
