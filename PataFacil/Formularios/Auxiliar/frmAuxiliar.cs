@@ -8,13 +8,13 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using PataFacil.Clases;   // para poder usar la clase Producto y la clase Sesion
+using PataFacil.Datos;    // para poder usar Dal_Auxiliar (base de datos)
 
 namespace PataFacil
 {
     public partial class frmAuxiliar : Form
     {
-        // Lista con TODOS los productos (por ahora son datos de prueba).
-        // Más adelante esta lista se va a llenar desde la base de datos.
+        // Lista con TODOS los productos (se llena leyendo la base de datos).
         private List<Producto> listaProductos = new List<Producto>();
 
         // Guarda el producto que la persona eligió en la grilla.
@@ -59,28 +59,28 @@ namespace PataFacil
 
         // -----------------------------------------------------------------
         // DATOS
-        // Estos métodos son los únicos que tocan la lista de datos de prueba.
-        // En la etapa de base de datos, se cambia lo que hay adentro de ellos
-        // por llamadas a Dal_Auxiliar y el resto del formulario no se toca.
+        // Estos métodos son los únicos que tocan los datos.
+        // ETAPA 5: ObtenerProductos() ya lee de la base de datos.
+        // Los demás (Insertar, Modificar y Registrar) todavía trabajan solo en memoria:
+        // en la etapa 6 se cambian por llamadas a Dal_Auxiliar y el resto no se toca.
         // -----------------------------------------------------------------
 
-        // Devuelve la lista de productos (datos de prueba escritos a mano).
+        // ETAPA 5: devuelve la lista de productos leyéndola de la base de datos.
         private List<Producto> ObtenerProductos()
         {
-            List<Producto> productos = new List<Producto>();
-
-            // Producto(id, nombre, categoria, stockActual, stockMinimo)
-            productos.Add(new Producto(1, "Vacuna Antirrábica", "Vacunas", 12, 5));
-            productos.Add(new Producto(2, "Vacuna Séxtuple", "Vacunas", 3, 8));              // stock bajo
-            productos.Add(new Producto(3, "Amoxicilina 500mg", "Medicamentos", 20, 10));
-            productos.Add(new Producto(4, "Antiparasitario Interno", "Medicamentos", 4, 6)); // stock bajo
-            productos.Add(new Producto(5, "Alimento Perro Adulto 15kg", "Alimentos", 9, 5));
-            productos.Add(new Producto(6, "Alimento Gato 10kg", "Alimentos", 2, 5));         // stock bajo
-            productos.Add(new Producto(7, "Guantes descartables", "Insumos", 50, 20));
-            productos.Add(new Producto(8, "Jeringas 5ml", "Insumos", 15, 15));               // justo en el mínimo: es OK
-            productos.Add(new Producto(9, "Collar antipulgas", "Otros", 7, 3));
-
-            return productos;
+            // try/catch: si la base no responde, el programa no se cierra con un error feo:
+            // va al "catch", muestra un mensaje y sigue con una lista vacía.
+            try
+            {
+                Dal_Auxiliar dal = new Dal_Auxiliar();
+                return dal.ObtenerProductos();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("No se pudieron cargar los productos: " + ex.Message, "Error",
+                                MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return new List<Producto>();
+            }
         }
 
         // ETAPA 3: agrega un producto nuevo a la lista.
