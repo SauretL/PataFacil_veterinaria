@@ -1,13 +1,4 @@
-﻿-- =====================================================================
--- PataFacil: script completo de la base de datos (unión de las ramas).
--- Se puede ejecutar las veces que haga falta con F5: si la base ya existe, la BORRA
--- (con todos sus datos) y la crea de nuevo. Cerrá el programa antes de ejecutarlo.
--- No usa rutas de archivos: SQL Server elige solo dónde guardarla, así que
--- funciona en cualquier PC.
--- =====================================================================
-
--- Hay que estar en "master" para poder borrar la base PataFacil
-USE [master];
+﻿USE [master];
 GO
 
 IF EXISTS (SELECT name FROM sys.databases WHERE name = N'PataFacil')
@@ -216,7 +207,7 @@ ALTER TABLE [dbo].[MovimientoStock] CHECK CONSTRAINT [FK_Movimiento_Usuario];
 GO
 
 -- ==========================================
--- CARGA DE DATOS INICIALES (USUARIOS)
+-- USUARIOS
 -- ==========================================
 INSERT INTO dbo.Usuario (Nombre, Email, PasswordHash, Rol, Activo)
 VALUES 
@@ -228,7 +219,6 @@ GO
 
 -- ==========================================
 -- CARGA DE DATOS INICIALES (PRODUCTOS DE PRUEBA)
--- El precio no se manda: queda en 0 por el valor por defecto.
 -- ==========================================
 INSERT INTO dbo.Producto (Nombre, Descripcion, StockActual, StockMinimo, Categoria)
 VALUES
