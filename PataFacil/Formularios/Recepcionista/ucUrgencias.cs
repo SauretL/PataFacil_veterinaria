@@ -8,12 +8,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using PataFacil.Datos;
+
 
 namespace PataFacil.Formularios.Recepcionista
 {
     public partial class ucUrgencias : UserControl
     {
-        private readonly string connectionString = "Server=.\\SQLEXPRESS;Database=PataFacil;Integrated Security=True;TrustServerCertificate=True;";
+        private readonly string connectionString = Conexion.sConnection;
 
         private int mascotaSeleccionadaId = -1;
         private int clienteSeleccionadoId = -1;
