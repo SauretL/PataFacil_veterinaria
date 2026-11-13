@@ -1,3 +1,15 @@
+﻿-- =====================================================================
+-- PataFacil: script completo de la base de datos (unión de las ramas).
+-- Se puede ejecutar las veces que haga falta con F5: si la base ya existe, la BORRA
+-- (con todos sus datos) y la crea de nuevo. Cerrá el programa antes de ejecutarlo.
+-- No usa rutas de archivos: SQL Server elige solo dónde guardarla, así que
+-- funciona en cualquier PC.
+-- =====================================================================
+
+-- Hay que estar en "master" para poder borrar la base PataFacil
+USE [master];
+GO
+
 IF EXISTS (SELECT name FROM sys.databases WHERE name = N'PataFacil')
 BEGIN
     ALTER DATABASE [PataFacil] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
@@ -113,10 +125,13 @@ CREATE TABLE [dbo].[Producto](
     [IdProducto] [int] IDENTITY(1,1) NOT NULL,
     [Nombre] [varchar](100) NOT NULL,
     [Descripcion] [varchar](250) NULL,
-    [PrecioUnitario] [decimal](10, 2) NOT NULL,
+    [PrecioUnitario] [decimal](10, 2) NOT NULL DEFAULT ((0)),
     [StockActual] [int] NOT NULL DEFAULT ((0)),
     [StockMinimo] [int] NOT NULL DEFAULT ((5)),
-    CONSTRAINT [PK_Producto] PRIMARY KEY CLUSTERED ([IdProducto] ASC)
+    [Categoria] [varchar](50) NOT NULL DEFAULT ('Otros'),
+    CONSTRAINT [PK_Producto] PRIMARY KEY CLUSTERED ([IdProducto] ASC),
+    CONSTRAINT [UQ_Producto_Nombre] UNIQUE NONCLUSTERED ([Nombre] ASC),
+    CONSTRAINT [CK_Producto_Stock] CHECK ([StockActual] >= 0 AND [StockMinimo] >= 0)
 ) ON [PRIMARY];
 GO
 
@@ -131,7 +146,9 @@ CREATE TABLE [dbo].[MovimientoStock](
     [Cantidad] [int] NOT NULL,
     [FechaHora] [datetime] NOT NULL DEFAULT (getdate()),
     [Observacion] [varchar](250) NULL,
-    CONSTRAINT [PK_MovimientoStock] PRIMARY KEY CLUSTERED ([IdMovimiento] ASC)
+    CONSTRAINT [PK_MovimientoStock] PRIMARY KEY CLUSTERED ([IdMovimiento] ASC),
+    CONSTRAINT [CK_Movimiento_Tipo] CHECK ([TipoMovimiento] IN ('Ingreso', 'Egreso')),
+    CONSTRAINT [CK_Movimiento_Cantidad] CHECK ([Cantidad] > 0)
 ) ON [PRIMARY];
 GO
 
@@ -207,4 +224,21 @@ VALUES
     ('Carlos Auxiliar', 'auxiliar@patafacil.com', 'auxiliar123', 'Auxiliar', 1),
     ('Dra. Maria Gomez', 'veterinaria@patafacil.com', 'veterinario123', 'Veterinario', 1),
     ('Admin Sistema', 'admin@patafacil.com', 'admin123', 'Administrador', 1);
+GO
+
+-- ==========================================
+-- CARGA DE DATOS INICIALES (PRODUCTOS DE PRUEBA)
+-- El precio no se manda: queda en 0 por el valor por defecto.
+-- ==========================================
+INSERT INTO dbo.Producto (Nombre, Descripcion, StockActual, StockMinimo, Categoria)
+VALUES
+    ('Vacuna Antirrábica',         NULL, 12,  5, 'Vacunas'),
+    ('Vacuna Séxtuple',            NULL,  3,  8, 'Vacunas'),
+    ('Amoxicilina 500mg',          NULL, 20, 10, 'Medicamentos'),
+    ('Antiparasitario Interno',    NULL,  4,  6, 'Medicamentos'),
+    ('Alimento Perro Adulto 15kg', NULL,  9,  5, 'Alimentos'),
+    ('Alimento Gato 10kg',         NULL,  2,  5, 'Alimentos'),
+    ('Guantes descartables',       NULL, 50, 20, 'Insumos'),
+    ('Jeringas 5ml',               NULL, 15, 15, 'Insumos'),
+    ('Collar antipulgas',          NULL,  7,  3, 'Otros');
 GO

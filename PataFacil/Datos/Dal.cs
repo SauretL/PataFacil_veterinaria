@@ -78,7 +78,7 @@ namespace PataFacil.Datos
                 comando.Parameters.AddWithValue("@hasta", fecha.Date.AddDays(1));
                 comando.Parameters.AddWithValue("@soloPend", soloPendientes);
 
-                
+
                 DataTable tabla = new DataTable();
                 SqlDataAdapter adaptador = new SqlDataAdapter(comando);
                 adaptador.Fill(tabla);
