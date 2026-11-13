@@ -7,51 +7,39 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using PataFacil.Clases;   // para poder usar la clase Producto y la clase Sesion
-using PataFacil.Datos;    // para poder usar Dal_Auxiliar (base de datos)
+using PataFacil.Clases;  
+using PataFacil.Datos;   
 
 namespace PataFacil
 {
     public partial class frmAuxiliar : Form
     {
-        // Lista con TODOS los productos (se llena leyendo la base de datos).
+        // lista con productos
         private List<Producto> listaProductos = new List<Producto>();
 
-        // Guarda el producto que la persona eligió en la grilla.
-        // Si no hay ninguno elegido vale null (null = "nada").
-        // ETAPA 3: también nos dice en qué modo estamos:
-        //   - null     -> estamos creando un producto NUEVO
-        //   - con dato -> estamos MODIFICANDO ese producto
+        // Guarda el producto en la grilla
         private Producto productoSeleccionado = null;
-
-        // ETAPA 4: lista con los movimientos (ingresos y egresos) registrados.
-        // Es de prueba: se pierde al cerrar el programa. Después se guarda en la base.
-        private List<MovimientoStock> listaMovimientos = new List<MovimientoStock>();
 
         public frmAuxiliar()
         {
             InitializeComponent();
 
-            // Todo lo que queremos que pase al abrir el formulario lo ponemos acá.
-
-            // Conectamos los eventos de estos controles con sus métodos.
-            // (Es lo mismo que hacer doble clic sobre el control en el diseñador.)
             btnBuscar.Click += btnBuscar_Click;
             dgvProductos.CellClick += dgvProductos_CellClick;
-            btnNuevo.Click += btnNuevo_Click;                        // ETAPA 3
-            btnGuardarProducto.Click += btnGuardarProducto_Click;    // ETAPA 3
-            btnIngreso.Click += btnIngreso_Click;                    // ETAPA 4
-            btnEgreso.Click += btnEgreso_Click;                      // ETAPA 4
-            btnNotificar.Click += btnNotificar_Click;                // ETAPA 4
+            btnNuevo.Click += btnNuevo_Click;                        
+            btnGuardarProducto.Click += btnGuardarProducto_Click;    
+            btnIngreso.Click += btnIngreso_Click;                    
+            btnEgreso.Click += btnEgreso_Click;                     
+            btnNotificar.Click += btnNotificar_Click;                
 
-            // Mostramos el nombre de quien inició sesión (lo guardó el login en Sesion)
+            // se muestra nombre del usuario
             lblUsuario.Text = "Usuario: " + Sesion.Nombre;
 
-            // Dejamos seleccionada la primera opción de los combos ("Todas" y "Vacunas")
+            // seleccion default de los cmb
             cmbFiltroCategoria.SelectedIndex = 0;
             cmbCategoria.SelectedIndex = 0;
 
-            // Obtenemos los productos y los mostramos en la grilla
+            // se obtienen lso productos y se muestran en grilla
             listaProductos = ObtenerProductos();
             MostrarProductos(listaProductos);
             ActualizarAlerta();
@@ -59,17 +47,12 @@ namespace PataFacil
 
         // -----------------------------------------------------------------
         // DATOS
-        // Estos métodos son los únicos que tocan los datos.
-        // ETAPA 5: ObtenerProductos() ya lee de la base de datos.
-        // Los demás (Insertar, Modificar y Registrar) todavía trabajan solo en memoria:
-        // en la etapa 6 se cambian por llamadas a Dal_Auxiliar y el resto no se toca.
         // -----------------------------------------------------------------
 
-        // ETAPA 5: devuelve la lista de productos leyéndola de la base de datos.
+        // devuelve la lista de productos desde la BD
         private List<Producto> ObtenerProductos()
         {
-            // try/catch: si la base no responde, el programa no se cierra con un error feo:
-            // va al "catch", muestra un mensaje y sigue con una lista vacía.
+            // try/catch para q si hay error en BD no se cierre todo
             try
             {
                 Dal_Auxiliar dal = new Dal_Auxiliar();
@@ -83,79 +66,55 @@ namespace PataFacil
             }
         }
 
-        // ETAPA 3: agrega un producto nuevo a la lista.
+        // agregar un producto nuevo en la base de datos.
         private void InsertarProducto(Producto nuevo)
         {
-            // Buscamos el Id más grande que haya y le sumamos 1.
-            // (Cuando usemos la base de datos, el Id lo va a poner SQL Server solo.)
-            int idMasGrande = 0;
-            foreach (Producto producto in listaProductos)
-            {
-                if (producto.Id > idMasGrande)
-                {
-                    idMasGrande = producto.Id;
-                }
-            }
-            nuevo.Id = idMasGrande + 1;
-
-            listaProductos.Add(nuevo);
+            Dal_Auxiliar dal = new Dal_Auxiliar();
+            dal.InsertarProducto(nuevo);
         }
 
-        // ETAPA 3: modifica un producto que ya existe en la lista.
-        // Busca el producto por Id y le cambia nombre, categoría y stock mínimo.
-        // El stock actual NO se toca acá: solo cambia con ingresos y egresos.
+        // modificar un producto que ya existe en la base de datos.
         private void ModificarProducto(Producto editado)
         {
-            foreach (Producto producto in listaProductos)
-            {
-                if (producto.Id == editado.Id)
-                {
-                    producto.Nombre = editado.Nombre;
-                    producto.Categoria = editado.Categoria;
-                    producto.StockMinimo = editado.StockMinimo;
-                }
-            }
+            Dal_Auxiliar dal = new Dal_Auxiliar();
+            dal.ModificarProducto(editado);
         }
 
-        // ETAPA 4: registra un movimiento: cambia el stock del producto y guarda el movimiento.
+        // registra un ingreso o egreso en la base de datos
         private void RegistrarMovimiento(MovimientoStock movimiento)
+        {
+            Dal_Auxiliar dal = new Dal_Auxiliar();
+            dal.RegistrarMovimiento(movimiento, Sesion.Email);
+        }
+
+        // Busca un producto de la lista por su Id. Si no lo encuentra devuelve null.
+        private Producto BuscarProductoPorId(int id)
         {
             foreach (Producto producto in listaProductos)
             {
-                if (producto.Id == movimiento.Producto.Id)
+                if (producto.Id == id)
                 {
-                    // Un ingreso suma stock y un egreso lo resta
-                    if (movimiento.Tipo == "Ingreso")
-                    {
-                        producto.StockActual = producto.StockActual + movimiento.Cantidad;
-                    }
-                    else
-                    {
-                        producto.StockActual = producto.StockActual - movimiento.Cantidad;
-                    }
+                    return producto;
                 }
             }
-
-            // Guardamos el movimiento en la lista de movimientos
-            listaMovimientos.Add(movimiento);
+            return null;
         }
 
         // -----------------------------------------------------------------
         // GRILLA
         // -----------------------------------------------------------------
 
-        // Recibe una lista de productos y la muestra en la grilla (dgvProductos).
-        // OJO: solo dibuja la grilla. El aviso de stock bajo se hace en ActualizarAlerta().
+        // Recibe una lista de productos y la muestra en la grilla
         private void MostrarProductos(List<Producto> productos)
         {
-            // Primero borramos las filas que hubiera, para no repetir productos
+            // se borran las filas que hay, para no repetir productos
             dgvProductos.Rows.Clear();
 
-            // Recorremos la lista: "producto" es cada uno de los productos
+            // se recorre lista con un foreach
             foreach (Producto producto in productos)
             {
                 // Agregamos una fila. Los valores van en el mismo orden que las columnas:
-                // Id (oculta), Producto, Categoría, Stock actual, Stock mínimo, Estado
+                // (Id no se muestra), producto, categoria, stock actual, stock min, estado
                 int numeroFila = dgvProductos.Rows.Add(
                     producto.Id,
                     producto.Nombre,
@@ -164,20 +123,19 @@ namespace PataFacil
                     producto.StockMinimo,
                     producto.ObtenerEstado());
 
-                // Si el producto está bajo el mínimo, pintamos la fila
+                // Si el producto está bajo el min, se resalta la fila
                 if (producto.EstaBajoMinimo())
                 {
                     dgvProductos.Rows[numeroFila].DefaultCellStyle.BackColor = Color.MistyRose;
                 }
             }
 
-            // Dejamos la grilla sin fila seleccionada
+            // grilla sin fila seleccionada
             dgvProductos.ClearSelection();
         }
 
-        // Cuenta cuántos productos de la lista COMPLETA están bajo el mínimo
-        // y muestra el aviso debajo de la grilla.
-        // Usa listaProductos (no la filtrada) para que el aviso no cambie al buscar.
+        // cuantos productos de la lista completa están bajo el min
+        // muestra el aviso debajo de la grilla
         private void ActualizarAlerta()
         {
             int cantidadBajoMinimo = 0;
@@ -196,7 +154,7 @@ namespace PataFacil
             }
             else
             {
-                lblAlerta.Text = "";   // si no hay ninguno, no mostramos nada
+                lblAlerta.Text = ""; // si no hay nada debajo del min entonces no muestra nada
             }
         }
 
@@ -205,17 +163,15 @@ namespace PataFacil
         // -----------------------------------------------------------------
 
         // Devuelve solo los productos que cumplen con lo que hay cargado en los filtros
-        // (texto, categoría y check de stock bajo). No muestra nada: solo arma la lista.
         private List<Producto> FiltrarProductos()
         {
-            // Lo que escribió la persona. Trim() borra espacios de los costados.
-            // ToLower() lo pasa a minúsculas para que no importe si escribe "VACUNA" o "vacuna".
+            // arregla mayus, minus y espacios de más
             string textoBuscado = txtBuscar.Text.Trim().ToLower();
 
-            // Categoría elegida en el combo ("Todas" significa sin filtro)
+            // Categoría elegida en el cmb
             string categoriaElegida = cmbFiltroCategoria.Text;
 
-            // true si está tildado "Solo stock bajo el mínimo"
+            // booleano por si se tilda solo stock bajo min
             bool soloBajoMinimo = chkSoloBajoMinimo.Checked;
 
             // Lista nueva donde guardamos solo los productos que cumplen todo
@@ -224,13 +180,12 @@ namespace PataFacil
             foreach (Producto producto in listaProductos)
             {
                 // 1) ¿El nombre contiene el texto buscado?
-                //    (si no escribió nada, el texto vacío está contenido en todos los nombres)
                 bool coincideNombre = producto.Nombre.ToLower().Contains(textoBuscado);
 
-                // 2) ¿Coincide la categoría? (o está en "Todas")
+                // 2) ¿Coincide la categoria? (todas incluye todas las categorias)
                 bool coincideCategoria = (categoriaElegida == "Todas") || (producto.Categoria == categoriaElegida);
 
-                // 3) ¿Cumple lo del stock? (si no está tildado, no importa el stock)
+                // 3) ¿Cumple lo del stock?
                 bool coincideStock = (soloBajoMinimo == false) || producto.EstaBajoMinimo();
 
                 // Si cumple las tres cosas, lo agregamos a la lista filtrada
@@ -264,19 +219,15 @@ namespace PataFacil
         // SELECCIONAR UN PRODUCTO DE LA GRILLA
         // -----------------------------------------------------------------
 
-        // Se ejecuta cuando la persona hace clic en una celda de la grilla.
         private void dgvProductos_CellClick(object sender, DataGridViewCellEventArgs e)
         {
-            // Si hizo clic en el encabezado de las columnas, RowIndex vale -1: no hacemos nada
             if (e.RowIndex < 0)
             {
                 return;
             }
 
-            // Leemos el Id de la fila elegida (está en la columna oculta colId)
             int idElegido = Convert.ToInt32(dgvProductos.Rows[e.RowIndex].Cells["colId"].Value);
 
-            // Buscamos ese Id dentro de la lista completa
             productoSeleccionado = null;
             foreach (Producto producto in listaProductos)
             {
@@ -286,7 +237,6 @@ namespace PataFacil
                 }
             }
 
-            // Si lo encontramos, mostramos sus datos en el panel de la derecha
             if (productoSeleccionado != null)
             {
                 txtNombreProducto.Text = productoSeleccionado.Nombre;
@@ -296,8 +246,6 @@ namespace PataFacil
             }
         }
 
-        // Deja el panel "Datos del producto" vacío y sin producto seleccionado.
-        // Como productoSeleccionado queda en null, el próximo "Guardar" crea un producto nuevo.
         private void LimpiarPanelProducto()
         {
             productoSeleccionado = null;
@@ -311,23 +259,20 @@ namespace PataFacil
         // ETAPA 3: PRODUCTO NUEVO Y GUARDAR
         // -----------------------------------------------------------------
 
-        // Botón "Producto Nuevo": prepara el panel para cargar un producto desde cero.
         private void btnNuevo_Click(object sender, EventArgs e)
         {
-            dgvProductos.ClearSelection();   // sacamos la selección de la grilla
-            LimpiarPanelProducto();          // vaciamos el panel (y queda en modo "nuevo")
-            txtNombreProducto.Focus();       // dejamos el cursor listo para escribir el nombre
+            dgvProductos.ClearSelection();  
+            LimpiarPanelProducto();          
+            txtNombreProducto.Focus();       
         }
 
-        // Botón "Guardar producto": sirve para crear uno nuevo o para modificar el elegido.
         private void btnGuardarProducto_Click(object sender, EventArgs e)
         {
-            // Leemos lo que escribió la persona
             string nombre = txtNombreProducto.Text.Trim();
             string categoria = cmbCategoria.Text;
-            int stockMinimo = (int)nudStockMinimo.Value;   // el NumericUpDown devuelve decimal, lo pasamos a int
+            int stockMinimo = (int)nudStockMinimo.Value;  
 
-            // --- VALIDACIONES: si algo está mal, avisamos y salimos con return ---
+            // VALIDACIONES
 
             if (nombre == "")
             {
@@ -353,8 +298,7 @@ namespace PataFacil
                 return;
             }
 
-            // Que no exista otro producto con el mismo nombre.
-            // Si estamos modificando, ignoramos al propio producto (si no, se "repetiría" consigo mismo).
+
             foreach (Producto producto in listaProductos)
             {
                 bool mismoNombre = producto.Nombre.ToLower() == nombre.ToLower();
@@ -371,24 +315,34 @@ namespace PataFacil
 
             // --- GUARDAR ---
 
-            if (productoSeleccionado == null)
+            // try/catch
+            try
             {
-                // Modo NUEVO: el stock actual empieza en 0 (se carga después con un ingreso).
-                // El Id es 0 por ahora; lo completa InsertarProducto.
-                Producto nuevo = new Producto(0, nombre, categoria, 0, stockMinimo);
-                InsertarProducto(nuevo);
+                if (productoSeleccionado == null)
+                {
+                    // Modo NUEVO: el stock actual empieza en 0 (se carga después con un ingreso).
+                    // El Id es 0 porque lo pone la base de datos sola.
+                    Producto nuevo = new Producto(0, nombre, categoria, 0, stockMinimo);
+                    InsertarProducto(nuevo);
+                }
+                else
+                {
+                    // Modo MODIFICAR: armamos el producto con los datos nuevos (mismo Id y mismo stock actual).
+                    Producto editado = new Producto(productoSeleccionado.Id, nombre, categoria,
+                                                    productoSeleccionado.StockActual, stockMinimo);
+                    ModificarProducto(editado);
+                }
             }
-            else
+            catch (Exception ex)
             {
-                // Modo MODIFICAR: armamos el producto con los datos nuevos (mismo Id y mismo stock actual).
-                Producto editado = new Producto(productoSeleccionado.Id, nombre, categoria,
-                                                productoSeleccionado.StockActual, stockMinimo);
-                ModificarProducto(editado);
+                MessageBox.Show("No se pudo guardar el producto: " + ex.Message, "Error",
+                                MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
             }
 
             // --- ACTUALIZAR LA PANTALLA ---
 
-            // Volvemos a mostrar la grilla respetando los filtros que estaban puestos
+            listaProductos = ObtenerProductos();
             MostrarProductos(FiltrarProductos());
             ActualizarAlerta();
             LimpiarPanelProducto();
@@ -398,7 +352,7 @@ namespace PataFacil
         }
 
         // -----------------------------------------------------------------
-        // ETAPA 4: INGRESOS, EGRESOS Y NOTIFICAR REPOSICIÓN
+        // INGRESOS, EGRESOS Y NOTIFICAR REPOSICION
         // -----------------------------------------------------------------
 
         private void btnIngreso_Click(object sender, EventArgs e)
@@ -411,10 +365,8 @@ namespace PataFacil
             AbrirMovimiento("Egreso");
         }
 
-        // Abre el formulario de movimiento. Sirve para los dos botones: el tipo llega como texto.
         private void AbrirMovimiento(string tipo)
         {
-            // Primero chequeamos que haya un producto elegido en la grilla
             if (productoSeleccionado == null)
             {
                 MessageBox.Show("Primero elegí un producto de la grilla.", "Atención",
@@ -422,7 +374,6 @@ namespace PataFacil
                 return;
             }
 
-            // No tiene sentido abrir un egreso si no queda nada para sacar
             if (tipo == "Egreso" && productoSeleccionado.StockActual == 0)
             {
                 MessageBox.Show("Este producto no tiene stock para sacar.", "Atención",
@@ -430,54 +381,61 @@ namespace PataFacil
                 return;
             }
 
-            // Creamos el formulario pasándole el producto y el tipo.
-            // "using" hace que se libere solo cuando termina.
+            MovimientoStock movimiento = null;
+
+      
             using (frmMovimientoStock formulario = new frmMovimientoStock(productoSeleccionado, tipo))
             {
-                // ShowDialog abre el formulario y el programa espera hasta que se cierre
                 DialogResult resultado = formulario.ShowDialog(this);
 
-                // Si apretó Cancelar (o cerró la ventana), no hacemos nada
                 if (resultado != DialogResult.OK)
                 {
                     return;
                 }
 
-                // Confirmó: armamos el movimiento con los datos que cargó
-                MovimientoStock movimiento = new MovimientoStock(
+                movimiento = new MovimientoStock(
                     productoSeleccionado, tipo, formulario.Cantidad, formulario.Fecha, formulario.Detalle);
-
-                RegistrarMovimiento(movimiento);
             }
 
-            // Guardamos el producto en una variable porque LimpiarPanelProducto lo pone en null
-            Producto productoModificado = productoSeleccionado;
+            int idModificado = productoSeleccionado.Id;
 
-            // Actualizamos la pantalla (la grilla respeta los filtros puestos)
+            try
+            {
+                RegistrarMovimiento(movimiento);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("No se pudo registrar el movimiento: " + ex.Message, "Error",
+                                MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            listaProductos = ObtenerProductos();
+            Producto productoModificado = BuscarProductoPorId(idModificado);
+
             MostrarProductos(FiltrarProductos());
             ActualizarAlerta();
             LimpiarPanelProducto();
 
-            // Avisamos cómo quedó el stock
-            string mensaje = tipo + " registrado. Stock actual de " + productoModificado.Nombre + ": " + productoModificado.StockActual;
-            if (productoModificado.EstaBajoMinimo())
+            if (productoModificado != null)
             {
-                mensaje = mensaje + "\n\nAtención: el producto quedó bajo el stock mínimo (" + productoModificado.StockMinimo + ").";
+                string mensaje = tipo + " registrado. Stock actual de " + productoModificado.Nombre + ": " + productoModificado.StockActual;
+                if (productoModificado.EstaBajoMinimo())
+                {
+                    mensaje = mensaje + "\n\nAtención: el producto quedó bajo el stock mínimo (" + productoModificado.StockMinimo + ").";
+                }
+                MessageBox.Show(mensaje, "Listo", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
-            MessageBox.Show(mensaje, "Listo", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
-        // Botón "Notificar reposición": por ahora solo muestra un mensaje con los productos a reponer.
         private void btnNotificar_Click(object sender, EventArgs e)
         {
             string mensaje = "";
 
-            // Recorremos TODOS los productos (no solo los que se ven en la grilla)
             foreach (Producto producto in listaProductos)
             {
                 if (producto.EstaBajoMinimo())
                 {
-                    // Cuántas unidades faltan para llegar al mínimo
                     int faltan = producto.StockMinimo - producto.StockActual;
 
                     mensaje = mensaje + "- " + producto.Nombre + ": stock " + producto.StockActual
@@ -503,15 +461,12 @@ namespace PataFacil
 
         private void btnCerrarSesion_Click(object sender, EventArgs e)
         {
-            // Borramos el email guardado: así el login sabe que se cerró sesión
-            // y vuelve a mostrarse solo.
+
             Sesion.Email = "";
 
-            // Cerramos este formulario
             this.Close();
         }
 
-        // Este método se completa más adelante (o se puede dejar vacío)
         private void txtBuscar_TextChanged(object sender, EventArgs e)
         {
 
